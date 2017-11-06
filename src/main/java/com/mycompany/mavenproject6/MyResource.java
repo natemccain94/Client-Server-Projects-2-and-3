@@ -264,14 +264,25 @@ public class MyResource {
         return GetAllStudentsNotEnrolledInClass(CourseID);
     }
     
+//    // Get all textbooks not being used by the course.
+//    @GET
+//    @Path("GetTextbooksNotRequiredByCourse/{TextOne}/{TextTwo}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public List<Textbook> GetTextbooksNotRequiredByCourse(@PathParam("TextOne") 
+//            int TextOne, @PathParam("TextTwo") int TextTwo)
+//    {
+//        return GetTextbooksCurrentlyNotUsedByCourse(TextOne, TextTwo);
+//    }
+    
     // Get all textbooks not being used by the course.
     @GET
-    @Path("GetTextbooksNotRequiredByCourse/{TextOne}/{TextTwo}")
+    @Path("GetTextbooksNotRequiredByCourse/{CourseID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Textbook> GetTextbooksNotRequiredByCourse(@PathParam("TextOne") 
-            int TextOne, @PathParam("TextTwo") int TextTwo)
+    public List<Textbook> GetTextbooksNotRequiredByCourse(@PathParam("CourseID") int CourseID)
     {
-        return GetTextbooksCurrentlyNotUsedByCourse(TextOne, TextTwo);
+        Course course = new Course();
+        course = GetSpecificCourse(CourseID);
+        return GetTextbooksCurrentlyNotUsedByCourse(course.TextOne, course.TextTwo);
     }
     
     // Get all courses the student is not enrolled in.
@@ -380,28 +391,60 @@ public class MyResource {
     // </editor-fold>
     
     // <editor-fold desc="Functions to do stuff to a course's textbooks.">
+//    // Add a textbook to the course's required textbooks list.
+//    @POST
+//    @Path("AddRequiredText/{CourseID}/{TextbookID}/{BookSlot}")
+//    @Consumes(MediaType.TEXT_HTML)
+//    public void AddRequiredText(@PathParam("CourseID") int CourseID, 
+//            @PathParam("TextbookID") int TextbookID, 
+//            @PathParam("BookSlot") int BookSlot)
+//    {
+//        if (BookSlot == 1)
+//            AddFirstRequiredTextbook(CourseID, TextbookID);
+//        else
+//            AddSecondRequiredTextbook(CourseID, TextbookID);
+//    }
+    
     // Add a textbook to the course's required textbooks list.
     @POST
-    @Path("AddRequiredText/{CourseID}/{TextbookID}/{BookSlot}")
+    @Path("AddRequiredText/{CourseID}/{TextbookID}")
     @Consumes(MediaType.TEXT_HTML)
     public void AddRequiredText(@PathParam("CourseID") int CourseID, 
-            @PathParam("TextbookID") int TextbookID, 
-            @PathParam("BookSlot") int BookSlot)
+            @PathParam("TextbookID") int TextbookID)
     {
-        if (BookSlot == 1)
-            AddFirstRequiredTextbook(CourseID, TextbookID);
-        else
+        Course course = new Course();
+        course = GetSpecificCourse(CourseID);
+        
+        if (course.TextOne != -1)
             AddSecondRequiredTextbook(CourseID, TextbookID);
+        else
+            AddFirstRequiredTextbook(CourseID, TextbookID);
     }
+    
+//    // Remove a textbook from the course's required textbooks list.
+//    @POST
+//    @Path("RemoveRequiredText/{CourseID}/{BookSlot}")
+//    @Consumes(MediaType.TEXT_HTML)
+//    public void RemoveRequiredText(@PathParam("CourseID") int CourseID, 
+//            @PathParam("BookSlot") int BookSlot)
+//    {
+//        if (BookSlot == 1)
+//            RemoveRequiredTextOneFromSpecifiedCourse(CourseID);
+//        else
+//            RemoveRequiredTextTwoFromSpecifiedCourse(CourseID);
+//    }
     
     // Remove a textbook from the course's required textbooks list.
     @POST
-    @Path("RemoveRequiredText/{CourseID}/{BookSlot}")
+    @Path("RemoveSpecifiedRequiredText/{CourseID}/{TextbookID}")
     @Consumes(MediaType.TEXT_HTML)
-    public void RemoveRequiredText(@PathParam("CourseID") int CourseID, 
-            @PathParam("BookSlot") int BookSlot)
+    public void RemoveSpecifiedRequiredText(@PathParam("CourseID") int CourseID, 
+            @PathParam("TextbookID") int TextbookID)
     {
-        if (BookSlot == 1)
+        Course course = new Course();
+        course = GetSpecificCourse(CourseID);
+        
+        if (course.TextOne == TextbookID)
             RemoveRequiredTextOneFromSpecifiedCourse(CourseID);
         else
             RemoveRequiredTextTwoFromSpecifiedCourse(CourseID);
@@ -461,6 +504,78 @@ public class MyResource {
             default:
                 StudentDropsCourseFive(StudentID);
                 break;
+        }
+    }
+    
+    // Sign a student up for the specified course, if possible.
+    @POST
+    @Path("SignStudentUpForClass/{StudentID}/{CourseID}")
+    @Consumes(MediaType.TEXT_HTML)
+    public void SignStudentUpForClass(@PathParam("StudentID") int StudentID,
+            @PathParam("CourseID") int CourseID)
+    {
+        Student student = new Student();
+        student = GetSpecificStudent(StudentID);
+        
+        if (student.CourseOne == -1)
+        {
+            EnrollStudentInTheirFirstCourse(StudentID, CourseID);
+        }
+        else if (student.CourseTwo == -1)
+        {
+            EnrollStudentInTheirSecondCourse(StudentID, CourseID);
+        }
+        else if (student.CourseThree == -1)
+        {
+            EnrollStudentInTheirThirdCourse(StudentID, CourseID);
+        }    
+        else if (student.CourseFour == -1)
+        {
+            EnrollStudentInTheirFourthCourse(StudentID, CourseID);
+        }    
+        else if (student.CourseFive == -1)
+        {
+            EnrollStudentInTheirFifthCourse(StudentID, CourseID);
+        }    
+        else
+        {
+            // Student can't enroll in any more classes. Do nothing.
+        }
+    }
+    
+    // Make a student drop the specified course.
+    @POST
+    @Path("StudentDropsSpecifiedClass/{StudentID}/{CourseID}")
+    @Consumes(MediaType.TEXT_HTML)
+    public void StudentDropsSpecifiedClass(@PathParam("StudentID") int StudentID,
+            @PathParam("CourseID") int CourseID)
+    {
+        Student student = new Student();
+        student = GetSpecificStudent(StudentID);
+        
+        if (student.CourseOne == CourseID)
+        {
+            StudentDropsCourseOne(StudentID);
+        }
+        else if (student.CourseTwo == CourseID)
+        {
+            StudentDropsCourseTwo(StudentID);
+        }
+        else if (student.CourseThree == CourseID)
+        {
+            StudentDropsCourseThree(StudentID);
+        }    
+        else if (student.CourseFour == CourseID)
+        {
+            StudentDropsCourseFour(StudentID);
+        }    
+        else if (student.CourseFive == CourseID)
+        {
+            StudentDropsCourseFive(StudentID);
+        }    
+        else
+        {
+            // Student is not enrolled in the specified course. Do nothing.
         }
     }
     // </editor-fold>

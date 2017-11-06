@@ -2665,8 +2665,7 @@ public class ConnectionToMySQL
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
             String query = "UPDATE Courses SET ";
-            query = query.concat("TextOne = TextTwo");
-            query = query.concat("TextTwo = -1");
+            query = query.concat("TextOne = -1");
             query = query.concat(" WHERE CourseID = ?");
             
             stmt = conn.prepareStatement(query);

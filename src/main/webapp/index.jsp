@@ -60,22 +60,33 @@
 				</td>
 				<td>
 					<p>Student's Textbooks:
-						<button type="button" onclick="AddStudentListTextbook()">Add</button>
-						<button type="button" onclick="RemoveStudentTextbook()">Remove</button>
+						<button type="button" 
+                                                        id="Buy Textbook for Student"
+                                                        onclick="AddStudentListTextbook()">Add</button>
+                                            
+						<button type="button" 
+                                                        id="Sell Textbook for Student"
+                                                        onclick="RemoveStudentTextbook()">Remove</button>
 					</p>
 					<p></p>
-					<select id="Students Textbooks" size="10">
+					<select id="Students Textbooks" 
+                                                size="10">
                                         </select>
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<p>Enrolled Courses:
-						<button type="button" onclick="AddStudentListEnrolledCourses()">Add</button>
-						<button type="button" onclick="RemoveStudentEnrolledCourse()">Remove</button>
+						<button type="button" 
+                                                        id="Student Add Class"
+                                                        onclick="AddStudentListEnrolledCourses()">Add</button>
+						<button type="button" 
+                                                        id="Student Drop Class"
+                                                        onclick="RemoveStudentEnrolledCourse()">Remove</button>
 					</p>
 					<p></p>
-					<select id="Enrolled Courses" size="10" onchange="OnChangeCoursesSelected()">
+					<select id="Enrolled Courses" size="10" 
+                                                onchange="OnChangeCoursesSelected()">
                                         </select>
 				</td>
 				<td>
@@ -109,29 +120,30 @@
 					<p>Required Textbooks:
 						<button type="button" id="Add Button for Required Textbooks List in Courses View"
                                                         style="display:visible;"
-                                                        onclick="AddCourseListRequiedTextbooks()">Add</button>
+                                                        onclick="PopulateTextbooksAvailableToRequire()">Add</button>
                                             
 						<button type="button" id="Delete Button for Required Textbooks List in Courses View"
                                                         style="display:none;"
-                                                        onclick="RemoveCourseRequiredTextbook()">Remove</button>
+                                                        onclick="RemoveRequiredTextbookFromCourse()">Remove</button>
 					</p>
 					<p></p>
-					<select id="Course List Required Textbooks" size="10">
+					<select id="Course List Required Textbooks" 
+                                                onchange="RequiredTextbookSelectedInCourseView()" size="10">
                                         </select>
 				</td>
 			</tr>
 			<tr>
 				<td>
 					<p>Enrolled Students:
-						<button type="button" onclick="AddStudentForCourseView()">Add</button>
+						<button type="button" onclick="PopulateStudentsThatCanEnrollInTheCourse()">Add</button>
                                                 
 						<button type="button" id="Delete Button for Enrolled Student List in Courses View"
                                                         style="display:none;"
-                                                        onclick="RemoveCourseEnrolledStudent()">Remove</button>
+                                                        onclick="DropStudentFromCourseInCourseView()">Remove</button>
 					</p>
 					<p></p>
 					<select id="Course List Enrolled Students" size="10" 
-                                                onchange="OnChangeEnrolledStudentsSelected()"></select>
+                                                onchange="EnrolledStudentSelectedInCourseView()"></select>
 				</td>
 				<td>
 					<p>Student's Textbooks:</p>
@@ -160,15 +172,16 @@
 		</table>
 	</div>
 
-	<div id="AddTable1">
-		<h3 id="AddTitle1"></h3>
+	<div id="AddTable">
+		<h3 id="AddTitle">Hello!</h3>
 		<table>
 			<tr>
 				<td>
-					<select id="HelperTable" size="10"></select>
-					<button type="button" id="AddingAnElementToList"
-                                                style="display:none;"
-                                                onclick="AddAnElementToList()">Add</button>
+                                    <select id="HelperTable" onchange="HelperTableElementSelected()"
+                                            size="10"></select>
+                                    <button type="button" id="AddingAnElementToList"
+                                            style="display:none;"
+                                            onclick="AddAnElementToList()">Add</button>
 				</td>
 			</tr>
 		</table>
@@ -212,16 +225,17 @@ function showTextbooksTable()
     document.getElementById("title").innerHTML = "Textbook View";
 }
 
-function ToggleAddSelect(text, divID)
+// Come back here and move this function into other functions.
+function ToggleAddSelect(text)
 {
-    document.getElementById(divID).innerHTML = text;
-    if(document.getElementById(divID).style.display === "block")
+    document.getElementById("AddTable").innerHTML = text;
+    if(document.getElementById("AddTable").style.display === "block")
     {
-        document.getElementById(divID).style.display = "none";
+        document.getElementById("AddTable").style.display = "none";
     }
-    else if(document.getElementById(divID).style.display === "none")
+    else if(document.getElementById("AddTable").style.display === "none")
     {
-        document.getElementById(divID).style.display = "block";
+        document.getElementById("AddTable").style.display = "block";
     }
 }
 
@@ -285,275 +299,181 @@ function InsertStudentIntoTableForViewing(givenID, Student)
     x.add(insertionItem);
 }
 
+// This function is used to set up the helper table for adding required textbooks
+// to a course. Only called while in the course view.
+function SetupHelperTableToAddRequiredTextbooks()
+{
+    ClearTable("HelperTable");
+    HideButton("AddingAnElementToList");
+    document.getElementById("AddTitle").text = "Available Textbooks to Add:";
+    document.getElementById("AddTable").style.display = "block";
+}
+
+// This function is used to set up the helper table for enrolling students in
+// a course. This one is to be used while in the course view.
+function SetupHelperTableToAddStudentToCourse()
+{
+    ClearTable("HelperTable");
+    HideButton("AddingAnElementToList");
+    document.getElementById("AddTitle").text = "Available Students to Enroll:";
+    document.getElementById("AddTable").style.display = "block";
+}
+
+// This function is used to set up the helper table for giving students textbooks.
+// It is only called while in the student view.
+function SetupHelperTableToAddTextbookToStudent()
+{
+    ClearTable("HelperTable");
+    HideButton("AddingAnElementToList");
+    document.getElementById("AddTitle").text = "Available Textbooks to Buy";
+    document.getElementById("AddTable").style.display = "block";
+}
+
+// This function is used to set up the helper table for enrolling students
+// in a course. This one is to be used while in the student view.
+function SetupHelperTableToAddCourseToStudent()
+{
+    ClearTable("HelperTable");
+    HideButton("AddingAnElementToList");
+    document.getElementById("AddTitle").text = "Available Courses to Add:";
+    document.getElementById("AddTable").style.display = "block";
+}
+
 </script>
 //--------------------Student View Functions--------------------//
 <script type="text/javascript">
-//Gets List of All Students and input into Selected options
-function StudentList(){
-	var StudentListxhttp = new XMLHttpRequest();
-	StudentListxhttp.open("GET", url+"/GetAllStudents");
-	StudentListxhttp.setRequestHeader("Content-type", "application/json");
-	StudentListxhttp.send();
-	StudentListxhttp.onreadystatechange=function(){
-		if(StudentListxhttp.status === 200 && StudentListxhttp.readyState === 4){
-			var Students = JSON.parse(StudentListxhttp.responseText);
-                        var textArea = document.getElementById("Student List");
-			for(var i in Students){
-                                var option = document.createElement("option");
-                                option.text = Students[i].LastName + ", " + Students[i].FirstName;
-                                option.value = Students[i].StudentID;
-                                textArea.add(option);
-				//document.getElementById("Student List").childNodes[i].innerHTML = Students[i].FirstName + " " + Students[i].LastName;
-				//document.getElementById("Student List").childNodes[i].value = Students[i].StudentID;
-			}
-		}
-	}
-}
-
-//Runs onchange on Student List. Matches Selected Student with a Student in the database.
-function GetStudentTextbooks(){
-	var temp = document.getElementById("Student List");
-	var id = temp.options[temp.selectedIndex].value;
-	var GetStudentTextbooksxhttp = new XMLHttpRequest();
-	GetStudentTextbooksxhttp.open("GET", url+"/GetAllStudents");
-	GetStudentTextbooksxhttp.setRequestHeader("Content-type", "application/json");
-	GetStudentTextbooksxhttp.send();
-	GetStudentTextbooksxhttp.onreadystatechange=function(){
-		if(GetStudentTextbooksxhttp.status === 200 && GetStudentTextbooksxhttp.readyState === 4){
-			var Students = JSON.parse(GetStudentTextbooksxhttp.responseText);
-			for(var i in Students){//switch to foreach loop
-				if(Students[i].StudentID === id){
-					PrintStudentTextbooks(Students[i].TextbookOne, Students[i].TextbookTwo, Students[i].TextbookThree,
-										 Students[i].TextbookFour, Students[i].TextbookFive, Students[i].TextbookSix,
-										 Students[i].TextbookSeven, Students[i].TextbookEight, Students[i].TextbookNine,
-										 Students[i].TextbookTen);
-					break;
-				}
-			}
-		}
-	}
-}
-
-//Ran by GetStudentTextBooks(). Inputs Textbooks into Selected options
-function PrintStudentTextbooks(one, two, three, four, five, six, seven, eight, nine, ten){
-	var PrintStudentTextbooksxhttp = new XMLHttpRequest();
-	PrintStudentTextbooksxhttp.open("GET", url+"/GetStudentTextbooks/"+one+"/"+two+"/"+three+"/"+four+"/"+five+"/"+six+"/"+seven+"/"+eight+"/"+nine+"/"+ten);
-	PrintStudentTextbooksxhttp.setRequestHeader("Content-type", "application/json");
-	PrintStudentTextbooksxhttp.send();
-	PrintStudentTextbooksxhttp.onreadystatechange=function(){
-		if(PrintStudentTextbooksxhttp.status === 200 && PrintStudentTextbooksxhttp.readyState === 4){
-			var Textbooks = JSON.parse(PrintStudentTextbooksxhttp.responseText);
-			for(var i in Textbooks){
-				document.getElementById("Students Textbooks").childNodes[i].innerHTML = Textbooks[i].title+" "+Textbooks[i].publisher+" "+Textbooks[i].edition+" "+Textbooks[i].date;
-				document.getElementById("Students Textbooks").childNodes[i].value = Textbooks[i].TextbookID;
-			}
-		}
-	}
-}
-
-//Runs onchange on Student List. Matches selected Student with a Student in the database.
-function GetStudentEnrolledCourses(){
-	var temp = document.getElementById("Student List");
-	var id = temp.options[temp.selectedIndex].value;
-	var GetEnrolledCoursesxhttp = new XMLHttpRequest();
-	GetEnrolledCoursesxhttp.open("GET", url+"/GetAllStudents");
-	GetEnrolledCoursesxhttp.setRequestHeader("Content-type", "application/json");
-	GetEnrolledCoursesxhttp.send();
-	GetEnrolledCoursesxhttp.onreadystatechange=function(){
-		if(GetEnrolledCoursesxhttp.status === 200 && GetEnrolledCoursesxhttp.readyState === 4){
-			var Students = JSON.parse(GetEnrolledCoursesxhttp.responseText);
-			for(var i in Students){//switch to foreach loop
-				if(Students[i].StudentID === id){
-					PrintStudentEnrolledCourses(Students[i].CourseOne, Students[i].CourseTwo, Students[i].CourseThree,
-												Students[i].CourseFour, Students[i].CourseFive);
-					break;
-				}
-			}
-		}
-	};
-}
-
-//Ran by GetStudentTextBooks(). Inputs Courses into Selected options
-function PrintStudentEnrolledCourses(one, two, three, four, five){
-	var PrintEnrolledCoursesxhttp = new XMLHttpRequest();
-	PrintEnrolledCoursesxhttp.open("GET", url+"/GetCoursesStudentIsTaking/"+one+"/"+two+"/"+three+"/"+four+"/"+five);
-	PrintEnrolledCoursesxhttp.setRequestHeader("Content-type", "application/json");
-	PrintEnrolledCoursesxhttp.send();
-	PrintEnrolledCoursesxhttp.onreadystatechange=function(){
-		if(PrintEnrolledCoursesxhttp.status === 200 && PrintEnrolledCoursesxhttp.readyState === 4){
-			var Courses = JSON.parse(PrintEnrolledCoursesxhttp.responseText);
-			for(var i in Courses){
-				document.getElementById("Enrolled Courses").childNodes[i].innerHTML = Courses[i].title;
-				document.getElementById("Enrolled Courses").childNodes[i].value = Courses[i].CourseID;
-			}
-		}
-	}
-}
-
-//Runs onchange on Enrolled Courses. Matches selected Course with a Course in the database.
-function GetRequiredTextbooks(){
-	var temp = document.getElementById("Enrolled Courses");
-	var id = temp.options[temp.selectedIndex].value;
-	var GetRequiredTextbooksxhttp = new XMLHttpRequest();
-	GetRequiredTextbooksxhttp.open("GET", url+"/GetAllCourses");
-	GetRequiredTextbooksxhttp.setRequestHeader("Content-type", "application/json");
-	GetRequiredTextbooksxhttp.send();
-	GetRequiredTextbooksxhttp.onreadystatechange=function(){
-		if(GetRequiredTextbooksxhttp.status === 200 && GetRequiredTextbooksxhttp.readyState === 4){
-			var Courses = JSON.parse(GetRequiredTextbooksxhttp.responseText);
-			for(var i in Courses){//switch to foreach loop
-				if(Courses[i].CourseID === id){
-					PrintRequiredTextbooks(Courses[i].Textone, Courses[i].TextTwo);
-					break;
-				}
-			}
-		}
-	}
-}
-
-//Ran by GetRequiredTextbooks(). Inputs Textbook into Selected options
-function PrintRequiredTextbooks(one, two){
-	var PrintRequiredTextbooksxhttp = new XMLHttpRequest();
-	PrintRequiredTextbooksxhttp.open("GET", url+"/GetRequiredTextbooks/"+one+"/"+two);
-	PrintRequiredTextbooksxhttp.setRequestHeader("Content-type", "application/json");
-	PrintRequiredTextbooksxhttp.send();
-	PrintRequiredTextbooksxhttp.onreadystatechange=function(){
-		if(PrintRequiredTextbooksxhttp.status === 200 && PrintRequiredTextbooksxhttp.readyState === 4){
-			var Textbooks = JSON.parse(PrintRequiredTextbooksxhttp.responseText);
-			for(var i in Textbooks){
-				document.getElementById("Required Textbooks").childNodes[i].innerHTML = Textbooks[i].title+" "+Textbooks[i].publisher+" "+Textbooks[i].edition+" "+Textbooks[i].date;
-				document.getElementById("Required Textbooks").childNodes[i].value = Textbooks[i].TextbookID;
-			}
-		}
-	}
-}
-
-function OnChangeStudentListSelected(){
-	GetStudentTextbooks();
-	GetStudentEnrolledCourses();
-}
-
-function OnChangeCoursesSelected(){
-	GetRequiredTextbooks();
-}
-
-</script>
-//--------------------Course View Functions--------------------//
-<script type="text/javascript">
 //Gets List of All Courses and input into Selected options
-function CourseList(){
-    ClearTable("Course List Required Textbooks");
-    ClearTable("Course List Enrolled Students");
-    ClearTable("Course List Students Textbooks");
-    ClearTable("Add1");
+function StudentList(){
+    ClearTable("Student List");
+    ClearTable("Students Textbooks");
+    ClearTable("Enrolled Courses");
+    ClearTable("Required Textbooks");
+    ClearTable("HelperTable");
     
-    var CourseListxhttp = new XMLHttpRequest();
-    CourseListxhttp.open("GET", url+"/GetAllCourses");
-    CourseListxhttp.setRequestHeader("Content-type", "application/json");
-    CourseListxhttp.send();
-    CourseListxhttp.onreadystatechange=function()
+    var StudentListxhttp = new XMLHttpRequest();
+    StudentListxhttp.open("GET", url+"/GetAllStudents");
+    StudentListxhttp.setRequestHeader("Content-type", "application/json");
+    StudentListxhttp.send();
+    StudentListxhttp.onreadystatechange=function()
     {
-        if(CourseListxhttp.status === 200 && CourseListxhttp.readyState === 4)
+        if(StudentListxhttp.status === 200 && StudentListxhttp.readyState === 4)
         {
-            var Courses = JSON.parse(CourseListxhttp.responseText);
-            for(var i in Courses)
+            var Students = JSON.parse(StudentListxhttp.responseText);
+            for(var i in Students)
             {
-                InsertCourseIntoTableForViewing("Course List", Courses[i]);
+                InsertStudentIntoTableForViewing("Student List", Students[i]);
             }
         }
     };
 }
 
 // When a course is selected in the courses list while in the courses view.
-function CourseSelectedInCourseView()
+function StudentSelectedInCourseView()
 {
-    var temp = document.getElementById("Course List");
+    HelperTableNoLongerTheFocus();
+    
+    var temp = document.getElementById("Student List");
     var id = temp.options[temp.selectedIndex].value;
     
-    ClearTable("Course List Required Textbooks");
-    ClearTable("Course List Enrolled Students");
+    ClearTable("Students Textbooks");
+    ClearTable("Enrolled Courses");
+    ClearTable("Required Textbooks");
     
-    ShowButton("Delete Button for Course List in Courses View");
-    ShowButton("Update Button in Courses View");
+    ShowButton("Delete Button for Student List in Students View");
+    ShowButton("Update Button in Students View");
+    ShowButton("Buy Textbook for Student");
+    ShowButton("Student Add Class");
+    
+    HideButton("Sell Textbook for Student");
+    HideButton("Student Drop Class");
     
     // Populate the required textbooks list.
-    PopulateTheRequiredTextbooksListInCourseView(id);
+    PopulateTheOwnedTextbooksListInStudentView(id);
     // Populate the enrolled students list.
-    PopulateTheEnrolledStudentsListInCourseView(id);
+    PopulateTheEnrolledCoursesListInStudentView(id);
 }
 
 // When the user clicks the add button to add a new course in the courses view.
-function AddCourseToDatabase()
+function AddStudentToDatabase()
 {
-    var CourseName = prompt("Please enter the name of the course:", "");
-    if(CourseName === null || CourseName === "")
+    var FirstName = prompt("Please enter the first name of the student", "");
+    if(FirstName === null || FirstName === "")
     {
         return;
     }
-    var AddCourseToCourseListxhttp = new XMLHttpRequest();
-    AddCourseToCourseListxhttp.open("POST", url+"/AddNewCourse/"+CourseName);
-    AddCourseToCourseListxhttp.setRequestHeader("Content-type", "text/html");
-    AddCourseToCourseListxhttp.send();
-    AddCourseToCourseListxhttp.onreadystatechange=function()
+    var LastName = prompt("Please enter the last name of the student:", "");
+    if (LastName === null || LastName === "")
     {
-        if(AddCourseToCourseListxhttp.status === 200 && AddCourseToCourseListxhttp.readyState === 4)
+        return;
+    }
+    var AddStudentToStudentListxhttp = new XMLHttpRequest();
+    AddStudentToStudentListxhttp.open("POST", url+"/AddNewStudent/"+FirstName+"/"+LastName);
+    AddStudentToStudentListxhttp.setRequestHeader("Content-type", "text/html");
+    AddStudentToStudentListxhttp.send();
+    AddStudentToStudentListxhttp.onreadystatechange=function()
+    {
+        if(AddStudentToStudentListxhttp.status === 204 && AddStudentToStudentListxhttp.readyState === 4)
         {
-            ClearTable("Course List");
-            CourseList();
+            StudentList();
         }
     };
 }
 
 // When the user clicks the update button in the courses view.
-function UpdateCourseInDatabase()
+function UpdateStudentInDatabase()
 {
-    var temp = document.getElementById("Course List");
+    var temp = document.getElementById("Student List");
     var id = temp.options[temp.selectedIndex].value;
     
-    var CourseName = prompt("Please enter the name of the course:", "");
-    if(CourseName === null || CourseName === "")
+    var FirstName = prompt("Please enter the first name of the student", "");
+    if(FirstName === null || FirstName === "")
     {
         return;
     }
-    
-    var UpdateCourseFromDatabasexhttp = new XMLHttpRequest();
-    UpdateCourseFromDatabasexhttp.open("POST", url+"/UpDateSelectedCourse/"+id+"/"+CourseName);
-    UpdateCourseFromDatabasexhttp.setRequestHeader("Content-type", "text/html");
-    UpdateCourseFromDatabasexhttp.send();
-    UpdateCourseFromDatabasexhttp.onreadystatechange=function()
+    var LastName = prompt("Please enter the last name of the student:", "");
+    if (LastName === null || LastName === "")
     {
-    	if(UpdateCourseFromDatabasexhttp.status === 204 && UpdateCourseFromDatabasexhttp.readyState === 4)
+        return;
+    }
+    var UpdateStudentToStudentListxhttp = new XMLHttpRequest();
+    UpdateStudentToStudentListxhttp.open("POST", url+"/UpDateSelectedStudent/"+id+"/"+FirstName+"/"+LastName);
+    UpdateStudentToStudentListxhttp.setRequestHeader("Content-type", "text/html");
+    UpdateStudentToStudentListxhttp.send();
+    UpdateStudentToStudentListxhttp.onreadystatechange=function()
+    {
+        if(UpdateStudentToStudentListxhttp.status === 204 && UpdateStudentToStudentListxhttp.readyState === 4)
         {
-            ClearTable("Course List");
-            HideButton("Delete Button for Course List in Courses View");
-            HideButton("Update Button in Courses View");
-            CourseList();
-	}
+            StudentList();
+        }
     };
 }
 
 // When the user deletes a course from the database in the courses view.
-function DeleteCourseInDatabase()
+function DeleteStudentInDatabase()
 {
-    var temp = document.getElementById("Course List");
+    var temp = document.getElementById("Student List");
     var id = temp.options[temp.selectedIndex].value;
     
-    var RemoveCourseFromDatabasexhttp = new XMLHttpRequest();
-    RemoveCourseFromDatabasexhttp.open("DELETE", url+"/DeleteSelectedCourse/"+id);
-    RemoveCourseFromDatabasexhttp.setRequestHeader("Content-type", "text/html");
-    RemoveCourseFromDatabasexhttp.send();
-    RemoveCourseFromDatabasexhttp.onreadystatechange=function()
+    var RemoveStudentFromDatabasexhttp = new XMLHttpRequest();
+    RemoveStudentFromDatabasexhttp.open("DELETE", url+"/DeleteSelectedStudent/"+id);
+    RemoveStudentFromDatabasexhttp.setRequestHeader("Content-type", "text/html");
+    RemoveStudentFromDatabasexhttp.send();
+    RemoveStudentFromDatabasexhttp.onreadystatechange=function()
     {
-    	if(RemoveCourseFromDatabasexhttp.status === 204 && RemoveCourseFromDatabasexhttp.readyState === 4)
+    	if(RemoveStudentFromDatabasexhttp.status === 204 && RemoveStudentFromDatabasexhttp.readyState === 4)
         {
-            ClearTable("Course List");
-            HideButton("Delete Button for Course List in Courses View");
-            HideButton("Update Button in Courses View");
-            TextbookList();
+            StudentList();
 	}
     };
 }
 
+
+
+
+
+
+// these are all functions that must be implemented.
+//**********************************************************************
 // Populate the required textbooks list in the Courses View.
 function PopulateTheRequiredTextbooksListInCourseView(CourseID)
 {
@@ -569,9 +489,13 @@ function PopulateTheRequiredTextbooksListInCourseView(CourseID)
             for(var i in Textbooks)
             {
                 InsertTextbookIntoTableForViewing("Course List Required Textbooks", Textbooks[i]);
-                if (i === 1)
+                if (i > 0)
                 {
                     HideButton("Add Button for Required Textbooks List in Courses View");
+                }
+                else
+                {
+                    ShowButton("Add Button for Required Textbooks List in Courses View");
                 }
             }
         }
@@ -603,19 +527,54 @@ function PopulateTheEnrolledStudentsListInCourseView(CourseID)
 // When a textbook is selected in required textbooks list while in the courses view.
 function RequiredTextbookSelectedInCourseView()
 {
+    HelperTableNoLongerTheFocus();
     
+    // Show the remove button
+    ShowButton("Delete Button for Required Textbooks List in Courses View");
+    HideButton("Delete Button for Enrolled Student List in Courses View");
 }
 
 // Populates the bottom textbox with available textbooks for the course to require.
 function PopulateTextbooksAvailableToRequire()
 {
+    var temp = document.getElementById("Course List");
+    var CourseID = temp.options[temp.selectedIndex].value;
     
+    // Call to set the bottom table appropriately.
+    SetupHelperTableToAddRequiredTextbooks();
+    
+    var GetTextbooksNotRequiredByCoursexhttp = new XMLHttpRequest();
+    GetTextbooksNotRequiredByCoursexhttp.open("GET", url+"/GetTextbooksNotRequiredByCourse/"+CourseID);
+    GetTextbooksNotRequiredByCoursexhttp.setRequestHeader("Content-type", "application/json");
+    GetTextbooksNotRequiredByCoursexhttp.send();
+    GetTextbooksNotRequiredByCoursexhttp.onreadystatechange=function()
+    {
+        if(GetTextbooksNotRequiredByCoursexhttp.status === 200 && GetTextbooksNotRequiredByCoursexhttp.readyState === 4)
+        {
+            var Textbooks = JSON.parse(GetTextbooksNotRequiredByCoursexhttp.responseText);
+            for(var i in Textbooks)
+            {
+                InsertTextbookIntoTableForViewing("HelperTable", Textbooks[i]);
+            }
+        }
+    };
 }
 
 // When a user wants to add a required textbook to a course while in the courses view.
-function AddRequiredTextbookToCourse()
+// Requires a helpertable function.
+function AddRequiredTextbookToCourse(CourseID, TextbookID)
 {
-    
+    var AddRequiredTextbookToCoursexhttp = new XMLHttpRequest();
+    AddRequiredTextbookToCoursexhttp.open("POST", url+"/AddRequiredText/"+CourseID+"/"+TextbookID);
+    AddRequiredTextbookToCoursexhttp.setRequestHeader("Content-type", "text/html");
+    AddRequiredTextbookToCoursexhttp.send();
+    AddRequiredTextbookToCoursexhttp.onreadystatechange=function()
+    {
+        if(AddRequiredTextbookToCoursexhttp.status === 204 && AddRequiredTextbookToCoursexhttp.readyState === 4)
+        {
+            CourseSelectedInCourseView();
+        }
+    };
 }
 
 // When a user wants to remove a required textbook from a course while in the courses view.
@@ -624,9 +583,10 @@ function RemoveRequiredTextbookFromCourse()
     var currentCourse = document.getElementById("Course List");
     var courseIdentifier = currentCourse.options[currentCourse.selectedIndex].value;
     var currentBook = document.getElementById("Course List Required Textbooks");
+    var bookIdentifier = currentBook.options[currentBook.selectedIndex].value;
     
     var RemoveRequiredTextbookFromCoursexhttp = new XMLHttpRequest();
-    RemoveRequiredTextbookFromCoursexhttp.open("DELETE", url+"/RemoveRequiredText/"+courseIdentifier+"/"+currentBook.selectedIndex);
+    RemoveRequiredTextbookFromCoursexhttp.open("POST", url+"/RemoveSpecifiedRequiredText/"+courseIdentifier+"/"+bookIdentifier);
     RemoveRequiredTextbookFromCoursexhttp.setRequestHeader("Content-type", "text/html");
     RemoveRequiredTextbookFromCoursexhttp.send();
     RemoveRequiredTextbookFromCoursexhttp.onreadystatechange=function()
@@ -634,6 +594,7 @@ function RemoveRequiredTextbookFromCourse()
     	if(RemoveRequiredTextbookFromCoursexhttp.status === 204 && RemoveRequiredTextbookFromCoursexhttp.readyState === 4)
         {
             ClearTable("Course List Required Textbooks");
+            ShowButton("Add Button for Required Textbooks List in Courses View");
             HideButton("Delete Button for Required Textbooks List in Courses View");
             PopulateTheRequiredTextbooksListInCourseView(courseIdentifier);
 	}
@@ -643,31 +604,458 @@ function RemoveRequiredTextbookFromCourse()
 // When a student is selected in the enrolled students list while in the courses view.
 function EnrolledStudentSelectedInCourseView()
 {
+    HelperTableNoLongerTheFocus();
+    
+    ShowButton("Delete Button for Enrolled Student List in Courses View");
+    HideButton("Delete Button for Required Textbooks List in Courses View");
+    
+    var temp = document.getElementById("Course List Enrolled Students");
+    var id = temp.options[temp.selectedIndex].value;
+    
+    ClearTable("Course List Students Textbooks");
+    PopulateTheSelectedStudentTextbooksInCourseView(id);
     
 }
 
 // Populates the selected student's textbooks in while in the courses view.
 function PopulateTheSelectedStudentTextbooksInCourseView(StudentID)
 {
-    
+    var StudentOwnedTextbooksxhttp = new XMLHttpRequest();
+    StudentOwnedTextbooksxhttp.open("GET", url+"/GetStudentTextbooks/"+StudentID);
+    StudentOwnedTextbooksxhttp.setRequestHeader("Content-type", "application/json");
+    StudentOwnedTextbooksxhttp.send();
+    StudentOwnedTextbooksxhttp.onreadystatechange=function()
+    {
+        if(StudentOwnedTextbooksxhttp.status === 200 && StudentOwnedTextbooksxhttp.readyState === 4)
+        {
+            var Textbooks = JSON.parse(StudentOwnedTextbooksxhttp.responseText);
+            for(var i in Textbooks)
+            {
+                InsertTextbookIntoTableForViewing("Course List Students Textbooks", Textbooks[i]);
+            }
+        }
+    };
 }
 
 // Populate the bottom textbox with students not enrolled in the course.
-function StudentsThatCanEnrollInTheCourse()
+function PopulateStudentsThatCanEnrollInTheCourse()
 {
+    var temp = document.getElementById("Course List");
+    var CourseID = temp.options[temp.selectedIndex].value;
     
+    // Call to set the bottom table appropriately.
+    SetupHelperTableToAddStudentToCourse();
+    
+    var GetStudentsNotEnrolledInCoursexhttp = new XMLHttpRequest();
+    GetStudentsNotEnrolledInCoursexhttp.open("GET", url+"/GetAllStudentsNotInThisCourse/"+CourseID);
+    GetStudentsNotEnrolledInCoursexhttp.setRequestHeader("Content-type", "application/json");
+    GetStudentsNotEnrolledInCoursexhttp.send();
+    GetStudentsNotEnrolledInCoursexhttp.onreadystatechange=function()
+    {
+        if(GetStudentsNotEnrolledInCoursexhttp.status === 200 && GetStudentsNotEnrolledInCoursexhttp.readyState === 4)
+        {
+            var Students = JSON.parse(GetStudentsNotEnrolledInCoursexhttp.responseText);
+            for(var i in Students)
+            {
+                InsertStudentIntoTableForViewing("HelperTable", Students[i]);
+            }
+            
+        }
+    }; 
 }
 
 // When a user wants to enroll a student in a course while in the courses view.
-function EnrollNewStudentInCourseInCourseView()
+// Requires a helpertable function.
+function EnrollNewStudentInCourseInCourseView(StudentID, CourseID)
 {
-    
+    var AddStudentToCoursexhttp = new XMLHttpRequest();
+    AddStudentToCoursexhttp.open("POST", url+"/SignStudentUpForClass/"+StudentID+"/"+CourseID);
+    AddStudentToCoursexhttp.setRequestHeader("Content-type", "text/html");
+    AddStudentToCoursexhttp.send();
+    AddStudentToCoursexhttp.onreadystatechange=function()
+    {
+        if(AddStudentToCoursexhttp.status === 204 && AddStudentToCoursexhttp.readyState === 4)
+        {
+            CourseSelectedInCourseView();
+        }
+    };
 }
 
 // When a user wants to drop a student from a course while in the courses view.
 function DropStudentFromCourseInCourseView()
 {
+    var currentCourse = document.getElementById("Course List");
+    var courseIdentifier = currentCourse.options[currentCourse.selectedIndex].value;
+    var currentStudent = document.getElementById("Course List Enrolled Students");
+    var currentStudentIdentifier = currentStudent.options[currentStudent.selectedIndex].value;
     
+    var RemoveRequiredTextbookFromCoursexhttp = new XMLHttpRequest();
+    RemoveRequiredTextbookFromCoursexhttp.open("POST", url+"/StudentDropsSpecifiedClass/"+currentStudentIdentifier+"/"+courseIdentifier);
+    RemoveRequiredTextbookFromCoursexhttp.setRequestHeader("Content-type", "text/html");
+    RemoveRequiredTextbookFromCoursexhttp.send();
+    RemoveRequiredTextbookFromCoursexhttp.onreadystatechange=function()
+    {
+    	if(RemoveRequiredTextbookFromCoursexhttp.status === 204 && RemoveRequiredTextbookFromCoursexhttp.readyState === 4)
+        {
+            ClearTable("Course List Enrolled Students");
+            HideButton("Delete Button for Enrolled Student List in Courses View");
+            PopulateTheEnrolledStudentsListInCourseView(courseIdentifier);
+	}
+    };
+}
+
+// end of functions that need to be implemented.
+
+</script>
+//--------------------Course View Functions--------------------//
+<script type="text/javascript">
+//Gets List of All Courses and input into Selected options
+function CourseList(){
+    ClearTable("Course List");
+    ClearTable("Course List Required Textbooks");
+    ClearTable("Course List Enrolled Students");
+    ClearTable("Course List Students Textbooks");
+    ClearTable("HelperTable");
+    
+    var CourseListxhttp = new XMLHttpRequest();
+    CourseListxhttp.open("GET", url+"/GetAllCourses");
+    CourseListxhttp.setRequestHeader("Content-type", "application/json");
+    CourseListxhttp.send();
+    CourseListxhttp.onreadystatechange=function()
+    {
+        if(CourseListxhttp.status === 200 && CourseListxhttp.readyState === 4)
+        {
+            var Courses = JSON.parse(CourseListxhttp.responseText);
+            for(var i in Courses)
+            {
+                InsertCourseIntoTableForViewing("Course List", Courses[i]);
+            }
+        }
+    };
+}
+
+// When a course is selected in the courses list while in the courses view.
+function CourseSelectedInCourseView()
+{
+    HelperTableNoLongerTheFocus();
+    
+    var temp = document.getElementById("Course List");
+    var id = temp.options[temp.selectedIndex].value;
+    
+    ClearTable("Course List Required Textbooks");
+    ClearTable("Course List Enrolled Students");
+    
+    ShowButton("Delete Button for Course List in Courses View");
+    ShowButton("Update Button in Courses View");
+    ShowButton("Add Button for Required Textbooks List in Courses View");
+    
+    HideButton("Delete Button for Enrolled Student List in Courses View");
+    HideButton("Delete Button for Required Textbooks List in Courses View");
+    
+    // Populate the required textbooks list.
+    PopulateTheRequiredTextbooksListInCourseView(id);
+    // Populate the enrolled students list.
+    PopulateTheEnrolledStudentsListInCourseView(id);
+}
+
+// When the user clicks the add button to add a new course in the courses view.
+function AddCourseToDatabase()
+{
+    var CourseName = prompt("Please enter the name of the course:", "");
+    if(CourseName === null || CourseName === "")
+    {
+        return;
+    }
+    var AddCourseToCourseListxhttp = new XMLHttpRequest();
+    AddCourseToCourseListxhttp.open("POST", url+"/AddNewCourse/"+CourseName);
+    AddCourseToCourseListxhttp.setRequestHeader("Content-type", "text/html");
+    AddCourseToCourseListxhttp.send();
+    AddCourseToCourseListxhttp.onreadystatechange=function()
+    {
+        if(AddCourseToCourseListxhttp.status === 204 && AddCourseToCourseListxhttp.readyState === 4)
+        {
+            ClearTable("Course List");
+            CourseList();
+        }
+    };
+}
+
+// When the user clicks the update button in the courses view.
+function UpdateCourseInDatabase()
+{
+    var temp = document.getElementById("Course List");
+    var id = temp.options[temp.selectedIndex].value;
+    
+    var CourseName = prompt("Please enter the name of the course:", "");
+    if(CourseName === null || CourseName === "")
+    {
+        return;
+    }
+    
+    var UpdateCourseFromDatabasexhttp = new XMLHttpRequest();
+    UpdateCourseFromDatabasexhttp.open("POST", url+"/UpDateSelectedCourse/"+id+"/"+CourseName);
+    UpdateCourseFromDatabasexhttp.setRequestHeader("Content-type", "text/html");
+    UpdateCourseFromDatabasexhttp.send();
+    UpdateCourseFromDatabasexhttp.onreadystatechange=function()
+    {
+    	if(UpdateCourseFromDatabasexhttp.status === 204 && UpdateCourseFromDatabasexhttp.readyState === 4)
+        {
+            HideButton("Delete Button for Course List in Courses View");
+            HideButton("Update Button in Courses View");
+            CourseList();
+	}
+    };
+}
+
+// When the user deletes a course from the database in the courses view.
+function DeleteCourseInDatabase()
+{
+    var temp = document.getElementById("Course List");
+    var id = temp.options[temp.selectedIndex].value;
+    
+    var RemoveCourseFromDatabasexhttp = new XMLHttpRequest();
+    RemoveCourseFromDatabasexhttp.open("DELETE", url+"/DeleteSelectedCourse/"+id);
+    RemoveCourseFromDatabasexhttp.setRequestHeader("Content-type", "text/html");
+    RemoveCourseFromDatabasexhttp.send();
+    RemoveCourseFromDatabasexhttp.onreadystatechange=function()
+    {
+    	if(RemoveCourseFromDatabasexhttp.status === 204 && RemoveCourseFromDatabasexhttp.readyState === 4)
+        {
+            HideButton("Delete Button for Course List in Courses View");
+            HideButton("Update Button in Courses View");
+            CourseList();
+	}
+    };
+}
+
+// Populate the required textbooks list in the Courses View.
+function PopulateTheRequiredTextbooksListInCourseView(CourseID)
+{
+    var GetCourseListRequiredTextbooksxhttp = new XMLHttpRequest();
+    GetCourseListRequiredTextbooksxhttp.open("GET", url+"/GetRequiredTextbooks/"+CourseID);
+    GetCourseListRequiredTextbooksxhttp.setRequestHeader("Content-type", "application/json");
+    GetCourseListRequiredTextbooksxhttp.send();
+    GetCourseListRequiredTextbooksxhttp.onreadystatechange=function()
+    {
+        if(GetCourseListRequiredTextbooksxhttp.status === 200 && GetCourseListRequiredTextbooksxhttp.readyState === 4)
+        {
+            var Textbooks = JSON.parse(GetCourseListRequiredTextbooksxhttp.responseText);
+            for(var i in Textbooks)
+            {
+                InsertTextbookIntoTableForViewing("Course List Required Textbooks", Textbooks[i]);
+                if (i > 0)
+                {
+                    HideButton("Add Button for Required Textbooks List in Courses View");
+                }
+                else
+                {
+                    ShowButton("Add Button for Required Textbooks List in Courses View");
+                }
+            }
+        }
+    };
+}
+
+// Populate the enrolled students list in the Courses View.
+function PopulateTheEnrolledStudentsListInCourseView(CourseID)
+{
+    var GetCourseEnrolledStudentsxhttp = new XMLHttpRequest();
+    GetCourseEnrolledStudentsxhttp.open("GET", url+"/GetCourseRoster/"+CourseID);
+    GetCourseEnrolledStudentsxhttp.setRequestHeader("Content-type", "application/json");
+    GetCourseEnrolledStudentsxhttp.send();
+    GetCourseEnrolledStudentsxhttp.onreadystatechange=function()
+    {
+        if(GetCourseEnrolledStudentsxhttp.status === 200 && GetCourseEnrolledStudentsxhttp.readyState === 4)
+        {
+            var Students = JSON.parse(GetCourseEnrolledStudentsxhttp.responseText);
+            for(var i in Students)
+            {
+                InsertStudentIntoTableForViewing("Course List Enrolled Students", Students[i]);
+                // Color the students here based on if they have the appropriate textbooks.
+                // Nate look here!!!!
+            }
+        }
+    };
+}
+
+// When a textbook is selected in required textbooks list while in the courses view.
+function RequiredTextbookSelectedInCourseView()
+{
+    HelperTableNoLongerTheFocus();
+    
+    // Show the remove button
+    ShowButton("Delete Button for Required Textbooks List in Courses View");
+    HideButton("Delete Button for Enrolled Student List in Courses View");
+}
+
+// Populates the bottom textbox with available textbooks for the course to require.
+function PopulateTextbooksAvailableToRequire()
+{
+    var temp = document.getElementById("Course List");
+    var CourseID = temp.options[temp.selectedIndex].value;
+    
+    // Call to set the bottom table appropriately.
+    SetupHelperTableToAddRequiredTextbooks();
+    
+    var GetTextbooksNotRequiredByCoursexhttp = new XMLHttpRequest();
+    GetTextbooksNotRequiredByCoursexhttp.open("GET", url+"/GetTextbooksNotRequiredByCourse/"+CourseID);
+    GetTextbooksNotRequiredByCoursexhttp.setRequestHeader("Content-type", "application/json");
+    GetTextbooksNotRequiredByCoursexhttp.send();
+    GetTextbooksNotRequiredByCoursexhttp.onreadystatechange=function()
+    {
+        if(GetTextbooksNotRequiredByCoursexhttp.status === 200 && GetTextbooksNotRequiredByCoursexhttp.readyState === 4)
+        {
+            var Textbooks = JSON.parse(GetTextbooksNotRequiredByCoursexhttp.responseText);
+            for(var i in Textbooks)
+            {
+                InsertTextbookIntoTableForViewing("HelperTable", Textbooks[i]);
+            }
+        }
+    };
+}
+
+// When a user wants to add a required textbook to a course while in the courses view.
+// Requires a helpertable function.
+function AddRequiredTextbookToCourse(CourseID, TextbookID)
+{
+    var AddRequiredTextbookToCoursexhttp = new XMLHttpRequest();
+    AddRequiredTextbookToCoursexhttp.open("POST", url+"/AddRequiredText/"+CourseID+"/"+TextbookID);
+    AddRequiredTextbookToCoursexhttp.setRequestHeader("Content-type", "text/html");
+    AddRequiredTextbookToCoursexhttp.send();
+    AddRequiredTextbookToCoursexhttp.onreadystatechange=function()
+    {
+        if(AddRequiredTextbookToCoursexhttp.status === 204 && AddRequiredTextbookToCoursexhttp.readyState === 4)
+        {
+            CourseSelectedInCourseView();
+        }
+    };
+}
+
+// When a user wants to remove a required textbook from a course while in the courses view.
+function RemoveRequiredTextbookFromCourse()
+{
+    var currentCourse = document.getElementById("Course List");
+    var courseIdentifier = currentCourse.options[currentCourse.selectedIndex].value;
+    var currentBook = document.getElementById("Course List Required Textbooks");
+    var bookIdentifier = currentBook.options[currentBook.selectedIndex].value;
+    
+    var RemoveRequiredTextbookFromCoursexhttp = new XMLHttpRequest();
+    RemoveRequiredTextbookFromCoursexhttp.open("POST", url+"/RemoveSpecifiedRequiredText/"+courseIdentifier+"/"+bookIdentifier);
+    RemoveRequiredTextbookFromCoursexhttp.setRequestHeader("Content-type", "text/html");
+    RemoveRequiredTextbookFromCoursexhttp.send();
+    RemoveRequiredTextbookFromCoursexhttp.onreadystatechange=function()
+    {
+    	if(RemoveRequiredTextbookFromCoursexhttp.status === 204 && RemoveRequiredTextbookFromCoursexhttp.readyState === 4)
+        {
+            ClearTable("Course List Required Textbooks");
+            ShowButton("Add Button for Required Textbooks List in Courses View");
+            HideButton("Delete Button for Required Textbooks List in Courses View");
+            PopulateTheRequiredTextbooksListInCourseView(courseIdentifier);
+	}
+    };
+}
+
+// When a student is selected in the enrolled students list while in the courses view.
+function EnrolledStudentSelectedInCourseView()
+{
+    HelperTableNoLongerTheFocus();
+    
+    ShowButton("Delete Button for Enrolled Student List in Courses View");
+    HideButton("Delete Button for Required Textbooks List in Courses View");
+    
+    var temp = document.getElementById("Course List Enrolled Students");
+    var id = temp.options[temp.selectedIndex].value;
+    
+    ClearTable("Course List Students Textbooks");
+    PopulateTheSelectedStudentTextbooksInCourseView(id);
+    
+}
+
+// Populates the selected student's textbooks in while in the courses view.
+function PopulateTheSelectedStudentTextbooksInCourseView(StudentID)
+{
+    var StudentOwnedTextbooksxhttp = new XMLHttpRequest();
+    StudentOwnedTextbooksxhttp.open("GET", url+"/GetStudentTextbooks/"+StudentID);
+    StudentOwnedTextbooksxhttp.setRequestHeader("Content-type", "application/json");
+    StudentOwnedTextbooksxhttp.send();
+    StudentOwnedTextbooksxhttp.onreadystatechange=function()
+    {
+        if(StudentOwnedTextbooksxhttp.status === 200 && StudentOwnedTextbooksxhttp.readyState === 4)
+        {
+            var Textbooks = JSON.parse(StudentOwnedTextbooksxhttp.responseText);
+            for(var i in Textbooks)
+            {
+                InsertTextbookIntoTableForViewing("Course List Students Textbooks", Textbooks[i]);
+            }
+        }
+    };
+}
+
+// Populate the bottom textbox with students not enrolled in the course.
+function PopulateStudentsThatCanEnrollInTheCourse()
+{
+    var temp = document.getElementById("Course List");
+    var CourseID = temp.options[temp.selectedIndex].value;
+    
+    // Call to set the bottom table appropriately.
+    SetupHelperTableToAddStudentToCourse();
+    
+    var GetStudentsNotEnrolledInCoursexhttp = new XMLHttpRequest();
+    GetStudentsNotEnrolledInCoursexhttp.open("GET", url+"/GetAllStudentsNotInThisCourse/"+CourseID);
+    GetStudentsNotEnrolledInCoursexhttp.setRequestHeader("Content-type", "application/json");
+    GetStudentsNotEnrolledInCoursexhttp.send();
+    GetStudentsNotEnrolledInCoursexhttp.onreadystatechange=function()
+    {
+        if(GetStudentsNotEnrolledInCoursexhttp.status === 200 && GetStudentsNotEnrolledInCoursexhttp.readyState === 4)
+        {
+            var Students = JSON.parse(GetStudentsNotEnrolledInCoursexhttp.responseText);
+            for(var i in Students)
+            {
+                InsertStudentIntoTableForViewing("HelperTable", Students[i]);
+            }
+            
+        }
+    }; 
+}
+
+// When a user wants to enroll a student in a course while in the courses view.
+// Requires a helpertable function.
+function EnrollNewStudentInCourseInCourseView(StudentID, CourseID)
+{
+    var AddStudentToCoursexhttp = new XMLHttpRequest();
+    AddStudentToCoursexhttp.open("POST", url+"/SignStudentUpForClass/"+StudentID+"/"+CourseID);
+    AddStudentToCoursexhttp.setRequestHeader("Content-type", "text/html");
+    AddStudentToCoursexhttp.send();
+    AddStudentToCoursexhttp.onreadystatechange=function()
+    {
+        if(AddStudentToCoursexhttp.status === 204 && AddStudentToCoursexhttp.readyState === 4)
+        {
+            CourseSelectedInCourseView();
+        }
+    };
+}
+
+// When a user wants to drop a student from a course while in the courses view.
+function DropStudentFromCourseInCourseView()
+{
+    var currentCourse = document.getElementById("Course List");
+    var courseIdentifier = currentCourse.options[currentCourse.selectedIndex].value;
+    var currentStudent = document.getElementById("Course List Enrolled Students");
+    var currentStudentIdentifier = currentStudent.options[currentStudent.selectedIndex].value;
+    
+    var RemoveRequiredTextbookFromCoursexhttp = new XMLHttpRequest();
+    RemoveRequiredTextbookFromCoursexhttp.open("POST", url+"/StudentDropsSpecifiedClass/"+currentStudentIdentifier+"/"+courseIdentifier);
+    RemoveRequiredTextbookFromCoursexhttp.setRequestHeader("Content-type", "text/html");
+    RemoveRequiredTextbookFromCoursexhttp.send();
+    RemoveRequiredTextbookFromCoursexhttp.onreadystatechange=function()
+    {
+    	if(RemoveRequiredTextbookFromCoursexhttp.status === 204 && RemoveRequiredTextbookFromCoursexhttp.readyState === 4)
+        {
+            ClearTable("Course List Enrolled Students");
+            HideButton("Delete Button for Enrolled Student List in Courses View");
+            PopulateTheEnrolledStudentsListInCourseView(courseIdentifier);
+	}
+    };
 }
 
 
@@ -732,9 +1120,11 @@ function AddTextbookToDatabase()
     AddTextbookToTextbookListxhttp.send();
     AddTextbookToTextbookListxhttp.onreadystatechange=function()
     {
-        if(AddTextbookToTextbookListxhttp.status === 200 && AddTextbookToTextbookListxhttp.readyState === 4)
+        if(AddTextbookToTextbookListxhttp.status === 204 && AddTextbookToTextbookListxhttp.readyState === 4)
         {
             ClearTable("Textbook List");
+            HideButton("Delete Button in Textbooks View");
+            HideButton("Update Button in Textbooks View");
             TextbookList();
         }
     };
@@ -807,9 +1197,80 @@ function DeleteTextbookInDatabase()
 <script type="text/javascript">
 //--------------------Button Functions--------------------//
 
-function Deselect(ElementID){
-	var temp = document.getElementById(ElementID);
-	temp.options[temp.selectedIndex].selected = false;
+// This function is called when the add button on the helper table is clicked.
+function AddAnElementToList()
+{
+    // Hide the add button after it has been clicked.
+    HideButton("AddingAnElementToList");
+    
+    // Adding a required textbook to a course.
+    if (document.getElementById("AddTitle").text === "Available Textbooks to Add:")
+    {
+        var temp = document.getElementById("Course List");
+        var itemAddingTo = temp.options[temp.selectedIndex].value;
+        
+        var otherTemp = document.getElementById("HelperTable");
+        var itemBeingAdded = otherTemp.options[otherTemp.selectedIndex].value;
+        
+        document.getElementById("AddTable").style.display = "none";
+        AddRequiredTextbookToCourse(itemAddingTo, itemBeingAdded);
+        
+    }
+    // Enrolling a student in a course.
+    else if (document.getElementById("AddTitle").text === "Available Students to Enroll:")
+    {
+        var temp = document.getElementById("HelperTable");
+        var itemAddingTo = temp.options[temp.selectedIndex].value;
+        
+        var otherTemp = document.getElementById("Course List");
+        var itemBeingAdded = otherTemp.options[otherTemp.selectedIndex].value;
+        
+        document.getElementById("AddTable").style.display = "none";
+        EnrollNewStudentInCourseInCourseView(itemAddingTo, itemBeingAdded);
+    }
+    // Student is buying a textbook.
+    else if (document.getElementById("AddTitle").text === "Available Textbooks to Buy")
+    {
+        var temp = document.getElementById("");
+        var itemAddingTo = temp.options[temp.selectedIndex].value;
+        
+        var otherTemp = document.getElementById("HelperTable");
+        var itemBeingAdded = otherTemp.options[otherTemp.selectedIndex].value;
+        
+        document.getElementById("AddTable").style.display = "none";
+        
+        
+    }
+    // Student is signing up for a course.
+    else
+    {
+        var temp = document.getElementById("");
+        var itemAddingTo = temp.options[temp.selectedIndex].value;
+        
+        var otherTemp = document.getElementById("HelperTable");
+        var itemBeingAdded = otherTemp.options[otherTemp.selectedIndex].value;
+        
+        document.getElementById("AddTable").style.display = "none";
+        
+    }
+    
+}
+
+function HelperTableElementSelected()
+{
+    ShowButton("AddingAnElementToList");
+}
+
+function HelperTableNoLongerTheFocus()
+{
+    HideButton("AddingAnElementToList");
+    document.getElementById("AddTable").style.display = "none";
+}
+
+function Deselect(ElementID)
+{
+    var temp = document.getElementById(ElementID);
+    temp.options[temp.selectedIndex].selected = false;
 }
 
 
