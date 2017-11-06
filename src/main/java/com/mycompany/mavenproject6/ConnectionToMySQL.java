@@ -2818,6 +2818,111 @@ public class ConnectionToMySQL
     // </editor-fold>
     
     // <editor-fold desc="Functions to return items from the database.">
+    // Get a specific course from the database.
+    public static Course GetSpecificCourse(int CourseID)
+            {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        Course course = new Course();
+        try
+        {
+            Class.forName(JDBC_Driver);
+            conn = DriverManager.getConnection(DB_URL, Username, Password);
+            String query = "SELECT * FROM Courses WHERE CourseID = ?";
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, CourseID);
+            
+            ResultSet results = stmt.executeQuery();
+            
+            while(results.next())
+            {
+                // Add each course to the list.
+                course.setCourseID(results.getInt(1));
+                course.setCourseName(results.getString(2));
+                course.setTextOne(results.getInt(3));
+                course.setTextTwo(results.getInt(4));
+            }
+            results.close();
+        }
+        catch(SQLException e){}
+        catch(Exception e){}
+        finally
+        {
+            try
+            {
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (SQLException e){}
+            try
+            {
+                if (conn != null)
+                    conn.close();
+            }
+            catch (SQLException e){}
+        }
+        return course;
+    }
+    
+    // Get a specific student from the database.
+    public static Student GetSpecificStudent(int StudentID)
+    {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        Student student = new Student();
+        try
+        {
+            Class.forName(JDBC_Driver);
+            conn = DriverManager.getConnection(DB_URL, Username, Password);
+            String query = "SELECT * FROM Students WHERE StudentID = ?";
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, StudentID);
+            
+            ResultSet results = stmt.executeQuery();
+            
+            while(results.next())
+            {
+                student.setStudentID(results.getInt(1));
+                student.setFirstName(results.getString(2));
+                student.setLastName(results.getString(3));
+                student.setCourseOne(results.getInt(4));
+                student.setCourseTwo(results.getInt(5));
+                student.setCourseThree(results.getInt(6));
+                student.setCourseFour(results.getInt(7));
+                student.setCourseFive(results.getInt(8));
+                student.setTextbookOne(results.getInt(9));
+                student.setTextbookTwo(results.getInt(10)); 
+                student.setTextbookThree(results.getInt(11)); 
+                student.setTextbookFour(results.getInt(12));
+                student.setTextbookFive(results.getInt(13));
+                student.setTextbookSix(results.getInt(14));
+                student.setTextbookSeven(results.getInt(15));
+                student.setTextbookEight(results.getInt(16));
+                student.setTextbookNine(results.getInt(17));
+                student.setTextbookTen(results.getInt(18));
+            }
+            results.close();
+        }
+        catch(SQLException e){}
+        catch(Exception e){}
+        finally
+        {
+            try
+            {
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (SQLException e){}
+            try
+            {
+                if (conn != null)
+                    conn.close();
+            }
+            catch (SQLException e){}
+        }
+        return student;
+    }
+            
     // Get all textbooks from the database.
     public static List<Textbook> GetAllTextbooksFromDatabase()
     {
@@ -3010,6 +3115,58 @@ public class ConnectionToMySQL
         return textList;
     }
     
+    // Get all required textbooks from a course.
+    public static List<Textbook> GetRequiredTextsForCourse(int CourseID)
+    {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        List<Textbook> textList = new ArrayList<Textbook>();
+        
+        try
+        {
+            Course course = new Course();
+            course = GetSpecificCourse(CourseID);
+            
+            Class.forName(JDBC_Driver);
+            conn = DriverManager.getConnection(DB_URL, Username, Password);
+            String query;
+            query = "SELECT * FROM Textbooks WHERE TextbookID = ? OR ";
+            query = query.concat("TextbookID = ?");
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, course.TextOne);
+            stmt.setInt(2, course.TextTwo);
+            
+            ResultSet results = stmt.executeQuery();
+            
+            while(results.next())
+            {
+                // Add each textbook to the list.
+                textList.add(new Textbook(results.getInt(1), 
+                        results.getString(2), results.getString(3), 
+                        results.getInt(4), results.getInt(5)));
+            }
+            results.close();
+        }
+        catch(SQLException e){}
+        catch(Exception e){}
+        finally
+        {
+            try
+            {
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (SQLException e){}
+            try
+            {
+                if (conn != null)
+                    conn.close();
+            }
+            catch (SQLException e){}
+        }
+        return textList;
+    }
+    
     // Get all textbooks owned by a student.
     public static List<Textbook> GetTextbooksOwnedByStudent(int TextbookOne,
             int TextbookTwo, int TextbookThree, int TextbookFour, 
@@ -3051,6 +3208,79 @@ public class ConnectionToMySQL
             stmt.setInt(8, TextbookEight);
             stmt.setInt(9, TextbookNine);
             stmt.setInt(10, TextbookTen);
+            
+            
+            ResultSet results = stmt.executeQuery();
+            
+            while(results.next())
+            {
+                // Add each textbook to the list.
+                textList.add(new Textbook(results.getInt(1), 
+                        results.getString(2), results.getString(3), 
+                        results.getInt(4), results.getInt(5)));
+            }
+            results.close();
+        }
+        catch(SQLException e){}
+        catch(Exception e){}
+        finally
+        {
+            try
+            {
+                if (stmt != null)
+                    stmt.close();
+            }
+            catch (SQLException e){}
+            try
+            {
+                if (conn != null)
+                    conn.close();
+            }
+            catch (SQLException e){}
+        }
+        return textList;
+    }
+    
+    // Get all textbooks owned by a student.
+    public static List<Textbook> GetTextbooksOwnedByStudent(int StudentID)
+    {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        Student student = new Student();
+        student = GetSpecificStudent(StudentID);
+        List<Textbook> textList = new ArrayList<Textbook>();
+        
+        // If TextOne is -1, then the student doens't have any textbooks.
+        if (student.TextbookOne == -1)
+            return textList;
+        
+        try
+        {
+            Class.forName(JDBC_Driver);
+            conn = DriverManager.getConnection(DB_URL, Username, Password);
+            String query;
+            query = "SELECT * FROM Textbooks WHERE TextbookID = ? OR ";
+            query = query.concat("TextbookID = ? OR ");
+            query = query.concat("TextbookID = ? OR ");
+            query = query.concat("TextbookID = ? OR ");
+            query = query.concat("TextbookID = ? OR ");
+            query = query.concat("TextbookID = ? OR ");
+            query = query.concat("TextbookID = ? OR ");
+            query = query.concat("TextbookID = ? OR ");
+            query = query.concat("TextbookID = ? OR ");
+            query = query.concat("TextbookID = ?");
+            
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, student.TextbookOne);
+            stmt.setInt(2, student.TextbookTwo);
+            stmt.setInt(3, student.TextbookThree);
+            stmt.setInt(4, student.TextbookFour);
+            stmt.setInt(5, student.TextbookFive);
+            stmt.setInt(6, student.TextbookSix);
+            stmt.setInt(7, student.TextbookSeven);
+            stmt.setInt(8, student.TextbookEight);
+            stmt.setInt(9, student.TextbookNine);
+            stmt.setInt(10, student.TextbookTen);
             
             
             ResultSet results = stmt.executeQuery();
