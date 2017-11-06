@@ -93,9 +93,11 @@
 				<td>
 					<p>Courses List:
 						<button type="button" onclick="AddCourseToDatabase()">Add</button>
+                                                
 						<button type="button" id="Delete Button for Course List in Courses View"
                                                         onclick="DeleteCourseInDatabase()"
                                                         style="display:none;">Remove</button>
+                                                        
                                                 <button type="button" id="Update Button in Courses View"
                                                         onclick="UpdateCourseInDatabase()"
                                                         style="display:none;">Update</button>
@@ -105,8 +107,13 @@
 				</td>
 				<td>
 					<p>Required Textbooks:
-						<button type="button" onclick="AddCourseListRequiedTextbooks()">Add</button>
-						<button type="button" onclick="RemoveCourseRequiredTextbook()">Remove</button>
+						<button type="button" id="Add Button for Required Textbooks List in Courses View"
+                                                        style="display:visible;"
+                                                        onclick="AddCourseListRequiedTextbooks()">Add</button>
+                                            
+						<button type="button" id="Delete Button for Required Textbooks List in Courses View"
+                                                        style="display:none;"
+                                                        onclick="RemoveCourseRequiredTextbook()">Remove</button>
 					</p>
 					<p></p>
 					<select id="Course List Required Textbooks" size="10">
@@ -117,7 +124,10 @@
 				<td>
 					<p>Enrolled Students:
 						<button type="button" onclick="AddStudentForCourseView()">Add</button>
-						<button type="button" onclick="RemoveCourseEnrolledStudent()">Remove</button>
+                                                
+						<button type="button" id="Delete Button for Enrolled Student List in Courses View"
+                                                        style="display:none;"
+                                                        onclick="RemoveCourseEnrolledStudent()">Remove</button>
 					</p>
 					<p></p>
 					<select id="Course List Enrolled Students" size="10" 
@@ -155,8 +165,10 @@
 		<table>
 			<tr>
 				<td>
-					<select id="Add1" size="10"></select>
-					<button type="button" onclick="SubmitAddStudentTextbook()">Add</button>
+					<select id="HelperTable" size="10"></select>
+					<button type="button" id="AddingAnElementToList"
+                                                style="display:none;"
+                                                onclick="AddAnElementToList()">Add</button>
 				</td>
 			</tr>
 		</table>
@@ -167,42 +179,50 @@
 // Check all open requests ie GET, POST, DELETE and check header types
 var url = "http://localhost:8080/mavenproject6/webapi/myresource";
 var AllTextbooks;
+var WhatListToAddTo;
 
-
-function onLoad(){
-	StudentList();
-	CourseList();
-	TextbookList();
+function onLoad()
+{
+    StudentList();
+    CourseList();
+    TextbookList();
 }
 
-function showStudentsTable() {
-	document.getElementById("StudentsTable").style.display = "block";
-	document.getElementById("CoursesTable").style.display = "none";
-	document.getElementById("TextbooksTable").style.display = "none";
-	document.getElementById("title").innerHTML = "Student View";
+function showStudentsTable() 
+{
+    document.getElementById("StudentsTable").style.display = "block";
+    document.getElementById("CoursesTable").style.display = "none";
+    document.getElementById("TextbooksTable").style.display = "none";
+    document.getElementById("title").innerHTML = "Student View";
 }
 
-function showCoursesTable() {
-	document.getElementById("StudentsTable").style.display = "none";
-	document.getElementById("CoursesTable").style.display = "block";
-	document.getElementById("TextbooksTable").style.display = "none";
-	document.getElementById("title").innerHTML = "Course View";
+function showCoursesTable() 
+{
+    document.getElementById("StudentsTable").style.display = "none";
+    document.getElementById("CoursesTable").style.display = "block";
+    document.getElementById("TextbooksTable").style.display = "none";
+    document.getElementById("title").innerHTML = "Course View";
 }
 
-function showTextbooksTable() {
-	document.getElementById("StudentsTable").style.display = "none";
-	document.getElementById("CoursesTable").style.display = "none";
-	document.getElementById("TextbooksTable").style.display = "block";
-	document.getElementById("title").innerHTML = "Textbook View";
+function showTextbooksTable() 
+{
+    document.getElementById("StudentsTable").style.display = "none";
+    document.getElementById("CoursesTable").style.display = "none";
+    document.getElementById("TextbooksTable").style.display = "block";
+    document.getElementById("title").innerHTML = "Textbook View";
 }
 
-function ToggleAddSelect(text, divID){
-	document.getElementById(divID).innerHTML = text;
-	if(document.getElementById(divID).style.display === "block"){
-		document.getElementById(divID).style.display = "none";
-	}else if(document.getElementById(divID).style.display === "none"){
-		document.getElementById(divID).style.display = "block";
-	}
+function ToggleAddSelect(text, divID)
+{
+    document.getElementById(divID).innerHTML = text;
+    if(document.getElementById(divID).style.display === "block")
+    {
+        document.getElementById(divID).style.display = "none";
+    }
+    else if(document.getElementById(divID).style.display === "none")
+    {
+        document.getElementById(divID).style.display = "block";
+    }
 }
 
 // This function is used to clear whatever table is identified by tableName.
@@ -255,7 +275,6 @@ function InsertCourseIntoTableForViewing(givenID, Course)
     x.add(insertionItem);
 }
 
-
 // This function is used to insert a student into whatever table id is given.
 function InsertStudentIntoTableForViewing(givenID, Student)
 {
@@ -265,8 +284,6 @@ function InsertStudentIntoTableForViewing(givenID, Student)
     insertionItem.value = Student.StudentID;
     x.add(insertionItem);
 }
-
-
 
 </script>
 //--------------------Student View Functions--------------------//
@@ -425,6 +442,11 @@ function OnChangeCoursesSelected(){
 <script type="text/javascript">
 //Gets List of All Courses and input into Selected options
 function CourseList(){
+    ClearTable("Course List Required Textbooks");
+    ClearTable("Course List Enrolled Students");
+    ClearTable("Course List Students Textbooks");
+    ClearTable("Add1");
+    
     var CourseListxhttp = new XMLHttpRequest();
     CourseListxhttp.open("GET", url+"/GetAllCourses");
     CourseListxhttp.setRequestHeader("Content-type", "application/json");
@@ -436,7 +458,7 @@ function CourseList(){
             var Courses = JSON.parse(CourseListxhttp.responseText);
             for(var i in Courses)
             {
-                InsertCourseIntoTableForViewing("Course List");
+                InsertCourseIntoTableForViewing("Course List", Courses[i]);
             }
         }
     };
@@ -460,6 +482,78 @@ function CourseSelectedInCourseView()
     PopulateTheEnrolledStudentsListInCourseView(id);
 }
 
+// When the user clicks the add button to add a new course in the courses view.
+function AddCourseToDatabase()
+{
+    var CourseName = prompt("Please enter the name of the course:", "");
+    if(CourseName === null || CourseName === "")
+    {
+        return;
+    }
+    var AddCourseToCourseListxhttp = new XMLHttpRequest();
+    AddCourseToCourseListxhttp.open("POST", url+"/AddNewCourse/"+CourseName);
+    AddCourseToCourseListxhttp.setRequestHeader("Content-type", "text/html");
+    AddCourseToCourseListxhttp.send();
+    AddCourseToCourseListxhttp.onreadystatechange=function()
+    {
+        if(AddCourseToCourseListxhttp.status === 200 && AddCourseToCourseListxhttp.readyState === 4)
+        {
+            ClearTable("Course List");
+            CourseList();
+        }
+    };
+}
+
+// When the user clicks the update button in the courses view.
+function UpdateCourseInDatabase()
+{
+    var temp = document.getElementById("Course List");
+    var id = temp.options[temp.selectedIndex].value;
+    
+    var CourseName = prompt("Please enter the name of the course:", "");
+    if(CourseName === null || CourseName === "")
+    {
+        return;
+    }
+    
+    var UpdateCourseFromDatabasexhttp = new XMLHttpRequest();
+    UpdateCourseFromDatabasexhttp.open("POST", url+"/UpDateSelectedCourse/"+id+"/"+CourseName);
+    UpdateCourseFromDatabasexhttp.setRequestHeader("Content-type", "text/html");
+    UpdateCourseFromDatabasexhttp.send();
+    UpdateCourseFromDatabasexhttp.onreadystatechange=function()
+    {
+    	if(UpdateCourseFromDatabasexhttp.status === 204 && UpdateCourseFromDatabasexhttp.readyState === 4)
+        {
+            ClearTable("Course List");
+            HideButton("Delete Button for Course List in Courses View");
+            HideButton("Update Button in Courses View");
+            CourseList();
+	}
+    };
+}
+
+// When the user deletes a course from the database in the courses view.
+function DeleteCourseInDatabase()
+{
+    var temp = document.getElementById("Course List");
+    var id = temp.options[temp.selectedIndex].value;
+    
+    var RemoveCourseFromDatabasexhttp = new XMLHttpRequest();
+    RemoveCourseFromDatabasexhttp.open("DELETE", url+"/DeleteSelectedCourse/"+id);
+    RemoveCourseFromDatabasexhttp.setRequestHeader("Content-type", "text/html");
+    RemoveCourseFromDatabasexhttp.send();
+    RemoveCourseFromDatabasexhttp.onreadystatechange=function()
+    {
+    	if(RemoveCourseFromDatabasexhttp.status === 204 && RemoveCourseFromDatabasexhttp.readyState === 4)
+        {
+            ClearTable("Course List");
+            HideButton("Delete Button for Course List in Courses View");
+            HideButton("Update Button in Courses View");
+            TextbookList();
+	}
+    };
+}
+
 // Populate the required textbooks list in the Courses View.
 function PopulateTheRequiredTextbooksListInCourseView(CourseID)
 {
@@ -475,6 +569,10 @@ function PopulateTheRequiredTextbooksListInCourseView(CourseID)
             for(var i in Textbooks)
             {
                 InsertTextbookIntoTableForViewing("Course List Required Textbooks", Textbooks[i]);
+                if (i === 1)
+                {
+                    HideButton("Add Button for Required Textbooks List in Courses View");
+                }
             }
         }
     };
@@ -508,133 +606,70 @@ function RequiredTextbookSelectedInCourseView()
     
 }
 
+// Populates the bottom textbox with available textbooks for the course to require.
+function PopulateTextbooksAvailableToRequire()
+{
+    
+}
+
+// When a user wants to add a required textbook to a course while in the courses view.
+function AddRequiredTextbookToCourse()
+{
+    
+}
+
+// When a user wants to remove a required textbook from a course while in the courses view.
+function RemoveRequiredTextbookFromCourse()
+{
+    var currentCourse = document.getElementById("Course List");
+    var courseIdentifier = currentCourse.options[currentCourse.selectedIndex].value;
+    var currentBook = document.getElementById("Course List Required Textbooks");
+    
+    var RemoveRequiredTextbookFromCoursexhttp = new XMLHttpRequest();
+    RemoveRequiredTextbookFromCoursexhttp.open("DELETE", url+"/RemoveRequiredText/"+courseIdentifier+"/"+currentBook.selectedIndex);
+    RemoveRequiredTextbookFromCoursexhttp.setRequestHeader("Content-type", "text/html");
+    RemoveRequiredTextbookFromCoursexhttp.send();
+    RemoveRequiredTextbookFromCoursexhttp.onreadystatechange=function()
+    {
+    	if(RemoveRequiredTextbookFromCoursexhttp.status === 204 && RemoveRequiredTextbookFromCoursexhttp.readyState === 4)
+        {
+            ClearTable("Course List Required Textbooks");
+            HideButton("Delete Button for Required Textbooks List in Courses View");
+            PopulateTheRequiredTextbooksListInCourseView(courseIdentifier);
+	}
+    };
+}
+
 // When a student is selected in the enrolled students list while in the courses view.
 function EnrolledStudentSelectedInCourseView()
 {
     
 }
 
-
-
-
-
-
-
-
-
-
-
-//Runs onchange on Course List. Matches Selected Course with a Course in the database.
-function GetCourseListRequiredTextbooks(){
-	var temp = document.getElementById("Course List");
-	var id = temp.options[temp.selectedIndex].value;
-	
+// Populates the selected student's textbooks in while in the courses view.
+function PopulateTheSelectedStudentTextbooksInCourseView(StudentID)
+{
+    
 }
 
-//Ran by GetCourseListRequiredTextbooks(). Inputs Textbooks into Selected options
-function PrintCourseListRequiredTextbooks(one, two,){
-	var PrintCourseListRequiredTextbooksxhttp = new XMLHttpRequest();
-	PrintCourseListRequiredTextbooksxhttp.open("GET", url+"/GetRequiredTextbooks/"+one+"/"+two);
-	PrintCourseListRequiredTextbooksxhttp.setRequestHeader("Content-type", "application/json");
-	PrintCourseListRequiredTextbooksxhttp.send();
-	PrintCourseListRequiredTextbooksxhttp.onreadystatechange=function(){
-		if(PrintCourseListRequiredTextbooksxhttp.status === 200 && PrintCourseListRequiredTextbooksxhttp.readyState === 4){
-			var Textbooks = JSON.parse(PrintCourseListRequiredTextbooksxhttp.responseText);
-			for(var i in Textbooks){
-				document.getElementById("Course List Required Textbook").childNodes[i].innerHTML = Textbooks[i].title+" "+Textbooks[i].publisher+" "+Textbooks[i].edition+" "+Textbooks[i].date;
-				document.getElementById("Course List Required Textbook").childNodes[i].value = Textbooks[i].TextbookID;
-			}
-		}
-	}
+// Populate the bottom textbox with students not enrolled in the course.
+function StudentsThatCanEnrollInTheCourse()
+{
+    
 }
 
-//Runs onchange on Course List. Matches Selected Course with a Course in the database.
-function GetCourseEnrolledStudents(){
-	var temp = document.getElementById("Course List");
-	var id = temp.options[temp.selectedIndex].value;
-	var GetCourseEnrolledStudentsxhttp = new XMLHttpRequest();
-	GetCourseEnrolledStudentsxhttp.open("GET", url+"/GetAllCourses");
-	GetCourseEnrolledStudentsxhttp.setRequestHeader("Content-type", "application/json");
-	GetCourseEnrolledStudentsxhttp.send();
-	GetCourseEnrolledStudentsxhttp.onreadystatechange=function(){
-		if(GetCourseEnrolledStudentsxhttp.status === 200 && GetCourseEnrolledStudentsxhttp.readyState === 4){
-			var Courses = JSON.parse(GetCourseEnrolledStudentsxhttp.responseText);
-			for(var i in Courses){//switch to foreach loop
-				if(Courses[i].CourseID === id){
-					PrintCourseEnrolledStudents(Courses[i].CourseID);
-					break;
-				}
-			}
-		}
-	}
+// When a user wants to enroll a student in a course while in the courses view.
+function EnrollNewStudentInCourseInCourseView()
+{
+    
 }
 
-//Ran by GetCourseEnrolledStudents(). Inputs Students into Selected options
-function PrintCourseEnrolledStudents(one){
-	var PrintCourseEnrolledStudentsxhttp = new XMLHttpRequest();
-	PrintCourseEnrolledStudentsxhttp.open("GET", url+"/GetCourseRoster/"+one);
-	PrintCourseEnrolledStudentsxhttp.setRequestHeader("Content-type", "application/json");
-	PrintCourseEnrolledStudentsxhttp.send();
-	PrintCourseEnrolledStudentsxhttp.onreadystatechange=function(){
-		if(PrintCourseEnrolledStudentsxhttp.status === 200 && PrintCourseEnrolledStudentsxhttp.readyState === 4){
-			var Students = JSON.parse(PrintCourseEnrolledStudentsxhttp.responseText);
-			for(var i in Students){
-				document.getElementById("Course List Enrolled Students").childNodes[i].innerHTML = Students[i].FirstName + " " + Students[i].LastName;
-				document.getElementById("Course List Enrolled Students").childNodes[i].value = Students[i].StudentID;
-			}
-		}
-	}
+// When a user wants to drop a student from a course while in the courses view.
+function DropStudentFromCourseInCourseView()
+{
+    
 }
 
-//Runs onchange on Course List Enrolled Students. Matches selected Student with a Student in the database.
-function GetCourseListEnrolledStudents(){
-	var temp = document.getElementById("Course List Enrolled Students");
-	var id = temp.options[temp.selectedIndex].value;
-	var GetCourseListEnrolledStudentsxhttp = new XMLHttpRequest();
-	GetCourseListEnrolledStudentsxhttp.open("GET", url+"/GetAllStudents");
-	GetCourseListEnrolledStudentsxhttp.setRequestHeader("Content-type", "application/json");
-	GetCourseListEnrolledStudentsxhttp.send();
-	GetCourseListEnrolledStudentsxhttp.onreadystatechange=function(){
-		if(GetCourseListEnrolledStudentsxhttp.status === 200 && GetCourseListEnrolledStudentsxhttp.readyState === 4){
-			var Students = JSON.parse(GetCourseListEnrolledStudentsxhttp.responseText);
-			for(var i in Students){//switch to foreach loop
-				if(Students[i].StudentID === id){
-					PrintEnrolledStudentsTextbook(Students[i].TextbookOne, Students[i].TextbookTwo, Students[i].TextbookThree,
-												  Students[i].TextbookFour, Students[i].TextbookFive, Students[i].TextbookSix,
-												  Students[i].TextbookSeven, Students[i].TextbookEight, Students[i].TextbookNine,
-												  Students[i].TextbookTen);
-					break;
-				}
-			}
-		}
-	}
-}
-
-//Ran by GetCourseListEnrolledStudents(). Inputs Textbook into Selected options
-function PrintEnrolledStudentsTextbook(one, two, three, four, five, six, seven, eight, nine, ten){
-	var PrintRequiredTextbooksxhttp = new XMLHttpRequest();
-	PrintRequiredTextbooksxhttp.open("GET", url+"/GetStudentTextbooks/"+one+"/"+two+"/"+three+"/"+four+"/"+five+"/"+six+"/"+seven+"/"+eight+"/"+nine+"/"+ten);
-	PrintRequiredTextbooksxhttp.setRequestHeader("Content-type", "application/json");
-	PrintRequiredTextbooksxhttp.send();
-	PrintRequiredTextbooksxhttp.onreadystatechange=function(){
-		if(PrintRequiredTextbooksxhttp.status === 200 && PrintRequiredTextbooksxhttp.readyState === 4){
-			var Textbooks = JSON.parse(PrintRequiredTextbooksxhttp.responseText);
-			for(var i in Textbooks){
-				document.getElementById("Course List Students Textbooks").childNodes[i].innerHTML = Textbooks[i].title+" "+Textbooks[i].publisher+" "+Textbooks[i].edition+" "+Textbooks[i].date;
-				document.getElementById("Course List Students Textbooks").childNodes[i].value = Textbooks[i].TextbookID;
-			}
-		}
-	}
-}
-
-function OnChangeCourseListSelected(){
-	GetCourseListRequiredTextbooks();
-	GetCourseEnrolledStudents();
-}
-
-function OnChangeEnrolledStudentsSelected(){
-	GetCourseListEnrolledStudents();
-}
 
 </script>
 //--------------------Textbook View Functions--------------------//
@@ -767,611 +802,10 @@ function DeleteTextbookInDatabase()
 	}
     };
 }
-
 </script>
 
 <script type="text/javascript">
 //--------------------Button Functions--------------------//
-
-function AddStudentToStudentList(){
-	var FirstName = prompt("Please Enter First Name of Student:", "");
-	if(FirstName === null || FirstName === ""){
-		return;
-	}
-	var LastName = prompt("Please Enter Last Name of Student:", "");
-	if(LastName === null || LastName === ""){
-		return;
-	}
-	var AddStudentToStudentListxhttp = new XMLHttpRequest();
-	AddStudentToStudentListxhttp.open("POST", url+"/AddNewStudent/"+FirstName+"/"+LastName);
-	AddStudentToStudentListxhttp.setRequestHeader("Content-type", "text/html");
-	AddStudentToStudentListxhttp.send();
-	AddStudentToStudentListxhttp.onreadystatechange=function(){
-		if(AddStudentToStudentListxhttp.status === 200 && AddStudentToStudentListxhttp.readyState === 4){
-			StudentList();
-			Deselect("Student List");
-		}	
-	};
-}
-
-function RemoveStudentFromDatabase(){
-	var temp = document.getElementById("Student List");
-	for(var i = 0; i<10; i++){
-		if(temp.options[i].selected === true){
-			break;
-		}
-		if(i === 9){
-			return;
-		}
-	}
-	var id = temp.options[temp.selectedIndex].value;
-	var RemoveStudentFromDatabasexhttp = new XMLHttpRequest();
-	RemoveStudentFromDatabasexhttp.open("DELETE", url+"/DeleteSelectedStudent/"+id);
-	RemoveStudentFromDatabasexhttp.setRequestHeader("Content-type", "text/html");
-	RemoveStudentFromDatabasexhttp.send();
-	RemoveStudentFromDatabasexhttp.onreadystatechange=function(){
-		if(RemoveStudentFromDatabasexhttp.status === 200 && RemoveStudentFromDatabasexhttp.readyState === 4){
-			for(var i = 0;i < 10; i++){
-				document.getElementById("Students Textbooks").childNodes[i].innerHTML = "";
-				document.getElementById("Students Textbooks").childNodes[i].value = "";
-				document.getElementById("Enrolled Courses").childNodes[i].innerHTMLL = "";
-				document.getElementById("Enrolled Courses").childNodes[i].value = "";
-				document.getElementById("Required Textbooks").childNodes[i].innerHTML = "";
-				document.getElementById("Required Textbooks").childNodes[i].value = "";
-			}
-		}
-	};
-}
-
-function RemoveStudentTextbook(){
-	var bookslot = document.getElementById("Students Textbooks").selectedIndex+1;
-	var studenttemp = document.getElementById("Student List");
-	var studentid = studenttemp.options[studenttemp.selectedIndex].value;
-	var RemoveStudentTextbookxhttp = new XMLHttpRequest();
-	RemoveStudentTextbookxhttp.open("DELETE", url+"/SellStudentTextbook/"+studentid+"/"+bookslot);
-	RemoveStudentTextbookxhttp.setRequestHeader("Content-type", "text/html");
-	RemoveStudentTextbookxhttp.send();
-	RemoveStudentTextbookxhttp.onreadystatechange=function(){
-		if(RemoveStudentTextbookxhttp.status === 200 && RemoveStudentTextbookxhttp.readyState === 4){
-			OnChangeStudentListSelected();
-		}
-	};
-}
-
-function RemoveStudentEnrolledCourse(){
-	var classSlot = document.getElementById("Enrolled Courses").selectedIndex+1;
-	var studenttemp = document.getElementById("Student List");
-	var studentid = studenttemp.options[studenttemp.selectedIndex].value;
-	var RemoveStudentEnrolledCoursexhttp = new XMLHttpRequest();
-	RemoveStudentEnrolledCoursexhttp.open("DELETE", url+"/StudentDropsClass/"+studentid+"/"+classSlot);
-	RemoveStudentEnrolledCoursexhttp.setRequestHeader("Content-type", "text/html");
-	RemoveStudentEnrolledCoursexhttp.send();
-	RemoveStudentEnrolledCoursexhttp.onreadystatechange=function(){
-		if(RemoveStudentEnrolledCoursexhttp.status === 200 && RemoveStudentEnrolledCoursexhttp.readyState === 4){
-			OnChangeStudentListSelected();
-		}
-	};
-}
-
-
-function AddCourseToCourseList(){
-	var CourseName = prompt("Please Enter Name of Course:", "");
-	if(CourseName === null || CourseName === ""){
-		return;
-	}
-	var AddCourseToCourseListxhttp = new XMLHttpRequest();
-	AddCourseToCourseListxhttp.open("POST", url+"/AddNewCourse/"+CourseName);
-	AddCourseToCourseListxhttp.setRequestHeader("Content-type", "text/html");
-	AddCourseToCourseListxhttp.send();
-	AddCourseToCourseListxhttp.onreadystatechange=function(){
-		if(AddCourseToCourseListxhttp.status === 200 && AddCourseToCourseListxhttp.readyState === 4){
-			CourseList();
-			Deselect("Course List");
-		}	
-	};
-}
-
-function RemoveCourseFromDatabase(){
-	var temp = document.getElementById("Course List");
-	for(var i = 0; i<10; i++){
-		if(temp.options[i].selected === true){
-			break;
-		}
-		if(i === 9){
-			return;
-		}
-	}
-	var id = temp.options[temp.selectedIndex].value;
-	var RemoveCourseFromDatabasexhttp = new XMLHttpRequest();
-	RemoveCourseFromDatabasexhttp.open("Delete", url+"/DeleteSelectedCourse/"+id);
-	RemoveCourseFromDatabasexhttp.setRequestHeader("Content-type", "text/html");
-	RemoveCourseFromDatabasexhttp.send();
-	RemoveCourseFromDatabasexhttp.onreadystatechange=function(){
-		if(RemoveCourseFromDatabasexhttp.status === 200 && RemoveCourseFromDatabasexhttp.readyState === 4){
-			CourseList();
-			Deselect("Course List");
-		}
-	};
-}
-
-function RemoveCourseRequiredTextbook(){
-	var bookslot = document.getElementById("Course List Required Textbook").selectedIndex+1;
-	var coursetemp = document.getElementById("Course List");
-	var courseid = coursetemp.options[coursetemp.selectedIndex].value;
-	var RemoveCourseRequiredTextbookxhttp = new XMLHttpRequest();
-	RemoveCourseRequiredTextbookxhttp.open("DELETE", url+"/RemoveRequiredText/"+studentid+"/"+bookslot);
-	RemoveCourseRequiredTextbookxhttp.setRequestHeader("Content-type", "text/html");
-	RemoveCourseRequiredTextbookxhttp.send();
-	RemoveCourseRequiredTextbookxhttp.onreadystatechange=function(){
-		if(RemoveCourseRequiredTextbookxhttp.status === 200 && RemoveCourseRequiredTextbookxhttp.readyState === 4){
-			OnChangeCourseListSelected();
-		}
-	};
-}
-
-function RemoveCourseEnrolledStudent(){
-	var studenttemp = document.getElementById("Course List Enrolled Students");
-	var studentid = studenttemp.options[studenttemp.selectedIndex].value;
-	var classtemp = document.getElementById("Course List");
-	var classid = classtemp.options[classtemp.selectedIndex].value;
-	var RemoveCourseEnrolledStudentxhttp = new XMLHttpRequest();
-	RemoveCourseEnrolledStudentxhttp.open("Get", url+"/GetAllStudents/");
-	RemoveCourseEnrolledStudentxhttp.setRequestHeader("Content-type", "text/html");
-	RemoveStudentEnrolledCoursexhttp.send();
-	RemoveCourseEnrolledStudentxhttp.onreadystatechange=function(){
-		if(RemoveCourseEnrolledStudentxhttp.status === 200 && RemoveCourseEnrolledStudentxhttp.readyState === 4){
-			var Students = JSON.parse(RemoveCourseEnrolledStudentxhttp.responseText);
-			for(var i in Students){//switch to foreach loop
-				if(Students[i].StudentID === studentid){
-					if(Students[i].CourseOne === classid){
-						FindStudentCourseSlot2(studentid, 1);
-					}
-					if(Students[i].CourseTwo === classid){
-						FindStudentCourseSlot2(studentid, 2);
-					}
-					if(Students[i].CourseThree === classid){
-						FindStudentCourseSlot2(studentid, 3);
-					}
-					if(Students[i].CourseFour === classid){
-						FindStudentCourseSlot2(studentid, 4);
-					}
-					if(Students[i].CourseFive === classid){
-						FindStudentCourseSlot2(studentid, 5);
-					}
-				}
-			}
-		}
-	};
-}
-
-function FindStudentCourseSlot2(StudentID, CourseSlot){
-	var FindStudentCourseSlot2xhttp = new XMLHttpRequest();
-	FindStudentCourseSlot2xhttp.open("DELETE", url+"/StudentDropsClass"+StudentID+"/"+CourseSlot);
-	FindStudentCourseSlot2xhttp.setRequestHeader("Content-type", "application/json");
-	FindStudentCourseSlot2xhttp.send();
-	FindStudentCourseSlot2xhttp.onreadystatechange=function(){
-		if(FindStudentCourseSlot2xhttp.status === 200 && FindStudentCourseSlot2xhttp.readyState === 4){
-			OnChangeCourseListSelected();
-		}
-	};
-}
-
-
-//--------------------Add Function 1-------------------//
-
-function AddStudentListTextbook(){
-	document.getElementById("AddTitle1").innerHTML = "Students Textbooks";
-	document.getElementById("AddTable1").style.display = "block";
-	GetStudentTextbooks2();
-}
-
-function GetStudentTextbooks2(){
-	var temp = document.getElementById("Student List");
-	var id = temp.options[temp.selectedIndex].value;
-	var GetStudentTextbooks2xhttp = new XMLHttpRequest();
-	GetStudentTextbooks2xhttp.open("GET", url+"/GetAllStudents");
-	GetStudentTextbooks2xhttp.setRequestHeader("Content-type", "application/json");
-	GetStudentTextbooks2xhttp.send();
-	GetStudentTextbooks2xhttp.onreadystatechange=function(){
-		if(GetStudentTextbooks2xhttp.status === 200 && GetStudentTextbooks2xhttp.readyState === 4){
-			var Students = JSON.parse(GetStudentTextbooks2xhttp.responseText);
-			for(var i in Students){//switch to foreach loop
-				if(Students[i].StudentID === id){
-					 PrintStudentTextbooks2(Students[i].TextbookOne, Students[i].TextbookTwo, Students[i].TextbookThree,
-										 Students[i].TextbookFour, Students[i].TextbookFive, Students[i].TextbookSix,
-										 Students[i].TextbookSeven, Students[i].TextbookEight, Students[i].TextbookNine);
-				}
-			}
-		}
-	};
-}
-
-function PrintStudentTextbooks2(one, two, three, four, five, six, seven, eight, nine){
-	var PrintStudentTextbooks2xhttp = new XMLHttpRequest();
-	PrintStudentTextbooks2xhttp.open("GET", url+"/GetTextbooksNotOwnedByStudent/"+one+"/"+two+"/"+three+"/"+four+"/"+five+"/"+six+"/"+seven+"/"+eight+"/"+nine);
-	PrintStudentTextbooks2xhttp.setRequestHeader("Content-type", "application/json");
-	PrintStudentTextbooks2xhttp.send();
-	PrintStudentTextbooks2xhttp.onreadystatechange=function(){
-		if(PrintStudentTextbooks2xhttp.status === 200 && PrintStudentTextbooks2xhttp.readyState === 4){
-			var Textbooks = JSON.parse(PrintStudentTextbooks2xhttp.responseText);
-			for(var i in Textbooks){
-					document.getElementById("Add1").childNodes[i].innerHTML = Textbooks[i].title+" "+Textbooks[i].publisher+" "+AllTextbooks[i].edition+" "+AllTextbooks[i].date;
-					document.getElementById("Add1").childNodes[i].value = Textbooks[i].TextbookID;
-			}
-		}
-	};
-}
-
-//kjgfhjkgfgjhfjhf
-function SubmitAddStudentTextbook(){
-	var temp = document.getElementById("Student List");
-	var id = temp.options[temp.selectedIndex].value;
-	var SubmitAddStudentTextbookxhttp = new XMLHttpRequest();
-	SubmitAddStudentTextbookxhttp.open("GET", url+"/GetAllStudents");
-	SubmitAddStudentTextbookxhttp.setRequestHeader("Content-type", "application/json");
-	SubmitAddStudentTextbookxhttp.send();
-	SubmitAddStudentTextbookxhttp.onreadystatechange=function(){
-		if(SubmitAddStudentTextbookxhttp.status === 200 && SubmitAddStudentTextbookxhttp.readyState === 4){
-			var Students = JSON.parse(SubmitAddStudentTextbookxhttp.responseText);
-			for(var i in Students){//switch to foreach loop
-				if(Students[i].StudentID === id){
-					if(Students[i].TextbookOne === -1){
-						SubmitAddStudentTextbook2(1);						
-						break;
-					}
-					if(Students[i].TextbookTwo === -1){
-						SubmitAddStudentTextbook2(2);						
-						break;
-					}
-					if(Students[i].TextbookThree === -1){
-						SubmitAddStudentTextbook2(3);						
-						break;
-					}
-					if(Students[i].TextbookFour === -1){
-						SubmitAddStudentTextbook2(4);						
-						break;
-					}
-					if(Students[i].TextbookFive === -1){
-						SubmitAddStudentTextbook2(5);						
-						break;
-					}
-					if(Students[i].TextbookSix === -1){
-						SubmitAddStudentTextbook2(6);						
-						break;
-					}
-					if(Students[i].TextbookSeven === -1){
-						SubmitAddStudentTextbook2(7);						
-						break;
-					}
-					if(Students[i].TextbookEight === -1){
-						SubmitAddStudentTextbook2(8);						
-						break;
-					}
-					if(Students[i].TextbookNine === -1){
-						SubmitAddStudentTextbook2(9);						
-						break;
-					}
-					if(Students[i].TextbookTen === -1){
-						SubmitAddStudentTextbook2(10);						
-						break;
-					}
-					//Couldn't add if code reached this far					
-					return;
-				}
-			}
-		}
-	};
-}
-
-function SubmitAddStudentTextbook2(textbookSlot){
-	var studenttemp = document.getElementById("Student List");
-	var studentid = studenttemp.options[studenttemp.selectedIndex].value;
-	var textbooktemp = document.getElementById("Add1");
-	var textbookid = textbooktemp.options[textbooktemp.selectedIndex].value;
-	var SubmitAddStudentTextbook2xhttp = new XMLHttpRequest();
-	SubmitAddStudentTextbook2xhttp.open("POST", url+"/GiveStudentTheTextbook/"+studentid+"/"+textbookid+"/"+textbookSlot);
-	SubmitAddStudentTextbook2xhttp.setRequestHeader("Content-type","text/html");
-	SubmitAddStudentTextbook2xhttp.send();
-	SubmitAddStudentTextbook2xhttp.onreadystatechange=function(){
-		if(SubmitAddStudentTextbook2xhttp.status === 200 && SubmitAddStudentTextbook2xhttp.readyState === 4){
-			document.getElementById("AddTitle1").innerHTML = "";
-			document.getElementById("AddTable1").style.display = "none";
-		}
-	};
-}
-
-//--------------------Add Function 2-------------------//
-
-function AddStudentListEnrolledCourses(){
-	document.getElementById("AddTitle2").innerHTML = "Enrolled Courses";
-	document.getElementById("AddTable2").style.display = "block";
-	GetStudentTextbooks2();
-}
-
-function GetEnrolledCourses2(){
-	var temp = document.getElementById("Student List");
-	var id = temp.options[temp.selectedIndex].value;
-	var GetEnrolledCourses2xhttp = new XMLHttpRequest();
-	GetEnrolledCourses2xhttp.open("GET", url+"/GetAllStudents");
-	GetEnrolledCourses2xhttp.setRequestHeader("Content-type", "application/json");
-	GetEnrolledCourses2xhttp.send();
-	GetEnrolledCourses2xhttp.onreadystatechange=function(){
-		if(GetEnrolledCourses2xhttp.status === 200 && GetEnrolledCourses2xhttp.readyState === 4){
-			var Students = JSON.parse(GetEnrolledCourses2xhttp.responseText);
-			for(var i in Students){//switch to foreach loop
-				if(Students[i].StudentID === id){
-					 PrintNotEnrolledCourses(Students[i].CourseOne, Students[i].CourseTwo, Students[i].CourseThree,
-										 Students[i].CourseFour);
-				}
-			}
-		}
-	};
-}
-
-function PrintNotEnrolledCourses(one, two, three, four){
-	var PrintNotEnrolledCoursesxhttp = new XMLHttpRequest();
-	PrintNotEnrolledCoursesxhttp.open("GET", url+"/GetCoursesTheStudentCanAdd/"+one+"/"+two+"/"+three+"/"+four);
-	PrintNotEnrolledCoursesxhttp.setRequestHeader("Content-type", "application/json");
-	PrintNotEnrolledCoursesxhttp.send();
-	PrintNotEnrolledCoursesxhttp.onreadystatechange=function(){
-		if(PrintNotEnrolledCoursesxhttp.status === 200 && PrintNotEnrolledCoursesxhttp.readyState === 4){
-			var Courses = JSON.parse(PrintNotEnrolledCoursesxhttp.responseText);
-			for(var i in Textbooks){
-					document.getElementById("Add1").childNodes[i].innerHTML = Courses[i].CourseName;
-					document.getElementById("Add1").childNodes[i].value = Courses[i].CourseID;
-			}
-		}
-	};
-}
-
-//kjgfhjkgfgjhfjhf
-function SubmitNotEnrolledCourses(){
-	var temp = document.getElementById("Student List");
-	var id = temp.options[temp.selectedIndex].value;
-	var SubmitNotEnrolledCoursesxhttp = new XMLHttpRequest();
-	SubmitNotEnrolledCoursesxhttp.open("GET", url+"/GetAllStudents");
-	SubmitNotEnrolledCoursesxhttp.setRequestHeader("Content-type", "application/json");
-	SubmitNotEnrolledCoursesxhttp.send();
-	SubmitNotEnrolledCoursesxhttp.onreadystatechange=function(){
-		if(SubmitNotEnrolledCoursesxhttp.status === 200 && SubmitNotEnrolledCoursesxhttp.readyState === 4){
-			var Students = JSON.parse(SubmitNotEnrolledCoursesxhttp.responseText);
-			for(var i in Students){//switch to foreach loop
-				if(Students[i].StudentID === id){
-					if(Students[i].CourseOne === -1){
-						SubmitNotEnrolledCourses2(1);						
-						break;
-					}
-					if(Students[i].CourseTwo === -1){
-						SubmitNotEnrolledCourses2(2);						
-						break;
-					}
-					if(Students[i].CourseThree === -1){
-						SubmitNotEnrolledCourses2(3);						
-						break;
-					}
-					if(Students[i].CourseFour === -1){
-						SubmitNotEnrolledCourses2(4);						
-						break;
-					}
-					if(Students[i].CourseFive === -1){
-						SubmitNotEnrolledCourses2(5);						
-						break;
-					}
-					//Couldn't add if code reached this far					
-					return;
-				}
-			}
-		}
-	};
-}
-
-function SubmitNotEnrolledCourses2(coursesSlot){
-	var studenttemp = document.getElementById("Student List");
-	var studentid = studenttemp.options[studenttemp.selectedIndex].value;
-	var coursetemp = document.getElementById("Add2");
-	var courseid = textbooktemp.options[textbooktemp.selectedIndex].value;
-	var SubmitAddStudentTextbook2xhttp = new XMLHttpRequest();
-	SubmitAddStudentTextbook2xhttp.open("POST", url+"/SignStudentUpForClass/"+studentid+"/"+courseid+"/"+coursesSlot);
-	SubmitAddStudentTextbook2xhttp.setRequestHeader("Content-type","text/html");
-	SubmitAddStudentTextbook2xhttp.send();
-	SubmitAddStudentTextbook2xhttp.onreadystatechange=function(){
-		if(SubmitAddStudentTextbook2xhttp.status === 200 && SubmitAddStudentTextbook2xhttp.readyState === 4){
-			document.getElementById("AddTitle2").innerHTML = "";
-			document.getElementById("AddTable2").style.display = "none";
-		}
-	};
-}
-
-//--------------------Add Function 3-------------------//
-
-function AddCourseListRequiedTextbooks(){
-	document.getElementById("AddTitle3").innerHTML = "Requied Textbooks";
-	document.getElementById("AddTable3").style.display = "block";
-	GetCourseList2();
-}
-
-function GetCourseList2(){
-	var temp = document.getElementById("Course List");
-	var id = temp.options[temp.selectedIndex].value;
-	var GetCourseList2xhttp = new XMLHttpRequest();
-	GetCourseList2xhttp.open("GET", url+"/GetAllCourses");
-	GetCourseList2xhttp.setRequestHeader("Content-type", "application/json");
-	GetCourseList2xhttp.send();
-	GetCourseList2xhttp.onreadystatechange=function(){
-		if(GetCourseList2xhttp.status === 200 && GetCourseList2xhttp.readyState === 4){
-			var Courses = JSON.parse(GetCourseList2xhttp.responseText);
-			for(var i in Courses){//switch to foreach loop
-				if(Courses[i].CourseID === id){
-					 PrintCourseViewRequiredTextbooks(Courses[i].TextOne, Courses[i].TextTwo);
-				}
-			}
-		}
-	};
-}
-
-function PrintCourseViewRequiredTextbooks(one, two){
-	var PrintCourseViewRequiredTextbooksxhttp = new XMLHttpRequest();
-	PrintCourseViewRequiredTextbooksxhttp.open("GET", url+"/GetTextbooksNotRequiredByCourse/"+one+"/"+two);
-	PrintCourseViewRequiredTextbooksxhttp.setRequestHeader("Content-type", "application/json");
-	PrintCourseViewRequiredTextbooksxhttp.send();
-	PrintCourseViewRequiredTextbooksxhttp.onreadystatechange=function(){
-		if(PrintCourseViewRequiredTextbooksxhttp.status === 200 && PrintCourseViewRequiredTextbooksxhttp.readyState === 4){
-			var Textbooks = JSON.parse(PrintCourseViewRequiredTextbooksxhttp.responseText);
-			for(var i in Textbooks){
-					document.getElementById("Add3").childNodes[i].innerHTML = Textbooks[i].title+" "+Textbooks[i].publisher+" "+AllTextbooks[i].edition+" "+AllTextbooks[i].date;
-					document.getElementById("Add3").childNodes[i].value = Textbooks[i].TextbookID;
-			}
-		}
-	};
-}
-
-//kjgfhjkgfgjhfjhf
-function SubmitCourseViewRequiredTextbook(){
-	var temp = document.getElementById("Course List");
-	var id = temp.options[temp.selectedIndex].value;
-	var SubmitCourseViewRequiredTextbookxhttp = new XMLHttpRequest();
-	SubmitCourseViewRequiredTextbookxhttp.open("GET", url+"/GetAllCourses");
-	SubmitCourseViewRequiredTextbookxhttp.setRequestHeader("Content-type", "application/json");
-	SubmitCourseViewRequiredTextbookxhttp.send();
-	SubmitCourseViewRequiredTextbookxhttp.onreadystatechange=function(){
-		if(SubmitCourseViewRequiredTextbookxhttp.status === 200 && SubmitCourseViewRequiredTextbookxhttp.readyState === 4){
-			var Courses = JSON.parse(SubmitCourseViewRequiredTextbookxhttp.responseText);
-			for(var i in Courses){//switch to foreach loop
-				if(Courses[i].StudentID === id){
-					if(Courses[i].TextOne === -1){
-						SubmitCourseViewRequiredTextbook2(1);						
-						break;
-					}
-					if(Courses[i].TextTwo === -1){
-						SubmitCourseViewRequiredTextbook2(2);						
-						break;
-					}
-					//Couldn't add if code reached this far					
-					return;
-				}
-			}
-		}
-	};
-}
-
-function SubmitCourseViewRequiredTextbook2(textbookSlot){
-	var coursetemp = document.getElementById("Course List");
-	var courseid = coursetemp.options[coursetemp.selectedIndex].value;
-	var textbooktemp = document.getElementById("Add3");
-	var textbookid = textbooktemp.options[textbooktemp.selectedIndex].value;
-	var SubmitCourseViewRequiredTextbook2xhttp = new XMLHttpRequest();
-	SubmitCourseViewRequiredTextbook2xhttp.open("POST", url+"/AddRequiredText/"+courseid+"/"+textbookid+"/"+textbookSlot);
-	SubmitCourseViewRequiredTextbook2xhttp.setRequestHeader("Content-type","text/html");
-	SubmitCourseViewRequiredTextbook2xhttp.send();
-	SubmitCourseViewRequiredTextbook2xhttp.onreadystatechange=function(){
-		if(SubmitCourseViewRequiredTextbook2xhttp.status === 200 && SubmitCourseViewRequiredTextbook2xhttp.readyState === 4){
-			document.getElementById("AddTitle3").innerHTML = "";
-			document.getElementById("AddTable3").style.display = "none";
-		}
-	};
-}
-
-//--------------------Add Function 4-------------------//
-
-
-function AddStudentForCourseView(){
-	document.getElementById("AddTitle4").innerHTML = "Enrolled Students";
-	document.getElementById("AddTable4").style.display = "block";
-	GetCourseList3();
-}
-
-function GetCourseList3(){
-	var temp = document.getElementById("Course List");
-	var id = temp.options[temp.selectedIndex].value;
-	var GetCourseList3xhttp = new XMLHttpRequest();
-	GetCourseList3xhttp.open("GET", url+"/GetAllCourses");
-	GetCourseList3xhttp.setRequestHeader("Content-type", "application/json");
-	GetCourseList3xhttp.send();
-	GetCourseList3xhttp.onreadystatechange=function(){
-		if(GetCourseList3xhttp.status === 200 && GetCourseList3xhttp.readyState === 4){
-			var Courses = JSON.parse(GetCourseList3xhttp.responseText);
-			for(var i in Courses){//switch to foreach loop
-				if(Courses[i].CourseID === id){
-					 PrintNotEnrolledStudents(Courses[i].CourseID);
-				}
-			}
-		}
-	};
-}
-
-function PrintNotEnrolledStudents(one){
-	var PrintNotEnrolledStudentsxhttp = new XMLHttpRequest();
-	PrintNotEnrolledStudentsxhttp.open("GET", url+"/GetAllStudentsNotInThisCourse/"+one);
-	PrintNotEnrolledStudentsxhttp.setRequestHeader("Content-type", "application/json");
-	PrintNotEnrolledStudentsxhttp.send();
-	PrintNotEnrolledStudentsxhttp.onreadystatechange=function(){
-		if(PrintNotEnrolledStudentsxhttp.status === 200 && PrintNotEnrolledStudentsxhttp.readyState === 4){
-			var Students = JSON.parse(PrintNotEnrolledStudentsxhttp.responseText);
-			for(var i in Students){
-					document.getElementById("Add4").childNodes[i].innerHTML = Students[i].FirstName+" "+Students[i].LastName;
-					document.getElementById("Add4").childNodes[i].value = Students[i].StudentID;
-			}
-		}
-	};
-}
-
-//kjgfhjkgfgjhfjhf
-function SubmitNotEnrolledStudent(){
-	var temp = document.getElementById("Add4");
-	var id = temp.options[temp.selectedIndex].value;
-	var SubmitNotEnrolledStudentxhttp = new XMLHttpRequest();
-	SubmitNotEnrolledStudentxhttp.open("GET", url+"/GetAllStudents");
-	SubmitNotEnrolledStudentxhttp.setRequestHeader("Content-type", "application/json");
-	SubmitNotEnrolledStudentxhttp.send();
-	SubmitNotEnrolledStudentxhttp.onreadystatechange=function(){
-		if(SubmitNotEnrolledStudentxhttp.status === 200 && SubmitNotEnrolledStudentxhttp.readyState === 4){
-			var Students = JSON.parse(SubmitNotEnrolledCoursesxhttp.responseText);
-			for(var i in Students){//switch to foreach loop
-				if(Students[i].StudentID === id){
-					if(Students[i].CourseOne === -1){
-						SubmitNotEnrolledStudent2(1);						
-						break;
-					}
-					if(Students[i].CourseTwo === -1){
-						SubmitNotEnrolledStudent2(2);						
-						break;
-					}
-					if(Students[i].CourseThree === -1){
-						SubmitNotEnrolledStudent2(3);						
-						break;
-					}
-					if(Students[i].CourseFour === -1){
-						SubmitNotEnrolledStudent2(4);						
-						break;
-					}
-					if(Students[i].CourseFive === -1){
-						SubmitNotEnrolledStudent2(5);						
-						break;
-					}
-					//Couldn't add if code reached this far					
-					return;
-				}
-			}
-		}
-	};
-}
-
-function SubmitNotEnrolledStudent2(classSlot){
-	var coursetemp = document.getElementById("Course List");
-	var courseid = coursetemp.options[coursetemp.selectedIndex].value;
-	var studenttemp = document.getElementById("Add3");
-	var studentid = studenttemp.options[studenttemp.selectedIndex].value;
-	var SubmitNotEnrolledStudent2xhttp = new XMLHttpRequest();
-	SubmitNotEnrolledStudent2xhttp.open("POST", url+"/SignStudentUpForClass/"+studentid+"/"+courseid+"/"+classSlot);
-	SubmitNotEnrolledStudent2xhttp.setRequestHeader("Content-type","text/html");
-	SubmitNotEnrolledStudent2xhttp.send();
-	SubmitNotEnrolledStudent2xhttp.onreadystatechange=function(){
-		if(SubmitNotEnrolledStudent2xhttp.status === 200 && SubmitNotEnrolledStudent2xhttp.readyState === 4){
-			document.getElementById("AddTitle4").innerHTML = "";
-			document.getElementById("AddTable4").style.display = "none";
-		}
-	};
-}
 
 function Deselect(ElementID){
 	var temp = document.getElementById(ElementID);
