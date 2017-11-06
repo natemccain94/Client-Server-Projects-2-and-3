@@ -235,23 +235,56 @@ public class MyResource {
         return GetCoursesStudentIsEnrolledIn(CourseOne,
             CourseTwo, CourseThree, CourseFour, CourseFive);
     }
+    
+    // Get all courses a student is enrolled in.
+    @GET
+    @Path("GetCoursesStudentIsTaking/{StudentID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Course> GetCoursesStudentIsTaking(@PathParam("StudentID") 
+            int StudentID)
+    {
+        Student student = new Student();
+        student = GetSpecificStudent(StudentID);
+        
+        return GetCoursesStudentIsEnrolledIn(student.CourseOne,
+            student.CourseTwo, student.CourseThree, 
+            student.CourseFour, student.CourseFive);
+    }
     // </editor-fold>
     
     // <editor-fold desc="Functions to get everything not associated with an item.">
     // Get all textbooks not owned by the student.
     // This will only be called if the student has room for another textbook.
+//    @GET
+//    @Path("GetTextbooksNotOwnedByStudent/{one}/{two}/{three}/{four}/{five}/{six}/{seven}/{eight}/{nine}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public List<Textbook> GetTextbooksNotOwnedByStudent(@PathParam("one") int TextbookOne,
+//            @PathParam("two") int TextbookTwo, @PathParam("three") int TextbookThree, 
+//            @PathParam("four") int TextbookFour, @PathParam("five") int TextbookFive, 
+//            @PathParam("six") int TextbookSix, @PathParam("seven") int TextbookSeven, 
+//            @PathParam("eight") int TextbookEight, @PathParam("nine") int TextbookNine)
+//    {
+//        return GetTextbooksCurrentlyNotOwnedByStudent(TextbookOne, TextbookTwo, 
+//                TextbookThree, TextbookFour, TextbookFive, TextbookSix,
+//            TextbookSeven, TextbookEight, TextbookNine);
+//    }
+    
+    // Get all textbooks not owned by the student.
+    // This will only be called if the student has room for another textbook.
     @GET
-    @Path("GetTextbooksNotOwnedByStudent/{one}/{two}/{three}/{four}/{five}/{six}/{seven}/{eight}/{nine}")
+    @Path("GetTextbooksNotOwnedByStudent/{StudentID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Textbook> GetTextbooksNotOwnedByStudent(@PathParam("one") int TextbookOne,
-            @PathParam("two") int TextbookTwo, @PathParam("three") int TextbookThree, 
-            @PathParam("four") int TextbookFour, @PathParam("five") int TextbookFive, 
-            @PathParam("six") int TextbookSix, @PathParam("seven") int TextbookSeven, 
-            @PathParam("eight") int TextbookEight, @PathParam("nine") int TextbookNine)
+    public List<Textbook> GetTextbooksNotOwnedByStudent(@PathParam("StudentID")
+            int StudentID)
     {
-        return GetTextbooksCurrentlyNotOwnedByStudent(TextbookOne, TextbookTwo, 
-                TextbookThree, TextbookFour, TextbookFive, TextbookSix,
-            TextbookSeven, TextbookEight, TextbookNine);
+        Student student = new Student();
+        student = GetSpecificStudent(StudentID);
+        
+        return GetTextbooksCurrentlyNotOwnedByStudent(student.TextbookOne, 
+                student.TextbookTwo, student.TextbookThree, 
+                student.TextbookFour, student.TextbookFive, 
+                student.TextbookSix,student.TextbookSeven, 
+            student.TextbookEight, student.TextbookNine);
     }
     
     // Get all students not enrolled in the course.
@@ -285,18 +318,33 @@ public class MyResource {
         return GetTextbooksCurrentlyNotUsedByCourse(course.TextOne, course.TextTwo);
     }
     
+//    // Get all courses the student is not enrolled in.
+//    // This will only be called if the student has room to add a course.
+//    @GET
+//    @Path("GetCoursesTheStudentCanAdd/{CourseOne}/{CourseTwo}/{CourseThree}/{CourseFour}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public List<Course> GetCoursesTheStudentCanAdd(@PathParam("CourseOne") 
+//            int CourseOne, @PathParam("CourseTwo") int CourseTwo, 
+//            @PathParam("CourseThree") int CourseThree,
+//            @PathParam("CourseFour") int CourseFour)
+//    {
+//        return GetAllCoursesStudentIsNotEnrolledIn(CourseOne, CourseTwo,
+//                CourseThree, CourseFour);
+//    }
+    
     // Get all courses the student is not enrolled in.
     // This will only be called if the student has room to add a course.
     @GET
-    @Path("GetCoursesTheStudentCanAdd/{CourseOne}/{CourseTwo}/{CourseThree}/{CourseFour}")
+    @Path("GetCoursesTheStudentCanAdd/{StudentID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Course> GetCoursesTheStudentCanAdd(@PathParam("CourseOne") 
-            int CourseOne, @PathParam("CourseTwo") int CourseTwo, 
-            @PathParam("CourseThree") int CourseThree,
-            @PathParam("CourseFour") int CourseFour)
+    public List<Course> GetCoursesTheStudentCanAdd(@PathParam("StudentID") 
+            int StudentID)
     {
-        return GetAllCoursesStudentIsNotEnrolledIn(CourseOne, CourseTwo,
-                CourseThree, CourseFour);
+        Student student = new Student();
+        student = GetSpecificStudent(StudentID);
+        
+        return GetAllCoursesStudentIsNotEnrolledIn(student.CourseOne, 
+                student.CourseTwo,student.CourseThree, student.CourseFour);
     }
     // </editor-fold>
     // </editor-fold>
@@ -305,87 +353,106 @@ public class MyResource {
     // Give a student a textbook. BookSlot indicates how many books the
     // student owns.
     @POST
-    @Path("GiveStudentTheTextbook/{StudentID}/{TextbookID}/{BookSlot}")
+    @Path("GiveStudentTheTextbook/{StudentID}/{TextbookID}")
     @Consumes(MediaType.TEXT_HTML)
     public void GiveStudentTheTextbook(@PathParam("StudentID") int StudentID, 
-            @PathParam("TextbookID") int TextbookID, 
-            @PathParam("BookSlot") int BookSlot)
+            @PathParam("TextbookID") int TextbookID)
     {
-        switch(BookSlot)
+        Student student = new Student();
+        student = GetSpecificStudent(StudentID);
+        
+        if (student.TextbookOne == -1)
         {
-            case 1:
-                GiveStudentFirstTextbook(StudentID, TextbookID);
-                break;
-            case 2:
-                GiveStudentSecondTextbook(StudentID, TextbookID);
-                break;
-            case 3:
-                GiveStudentThirdTextbook(StudentID, TextbookID);
-                break;
-            case 4:
-                GiveStudentFourthTextbook(StudentID, TextbookID);
-                break;
-            case 5:
-                GiveStudentFifthTextbook(StudentID, TextbookID);
-                break;
-            case 6:
-                GiveStudentSixthTextbook(StudentID, TextbookID);
-                break;
-            case 7:
-                GiveStudentSeventhTextbook(StudentID, TextbookID);
-                break;
-            case 8:
-                GiveStudentEighthTextbook(StudentID, TextbookID);
-                break;
-            case 9:
-                GiveStudentNinthTextbook(StudentID, TextbookID);
-                break;
-            default:
-                GiveStudentTenthTextbook(StudentID, TextbookID);
-                break;
+            GiveStudentFirstTextbook(StudentID, TextbookID);
+        }
+        else if (student.TextbookTwo == -1)
+        {
+            GiveStudentSecondTextbook(StudentID, TextbookID);
+        }
+        else if (student.TextbookThree == -1)
+        {
+            GiveStudentThirdTextbook(StudentID, TextbookID);
+        }
+        else if (student.TextbookFour == -1)
+        {
+            GiveStudentFourthTextbook(StudentID, TextbookID);
+        }
+        else if (student.TextbookFive == -1)
+        {
+            GiveStudentFifthTextbook(StudentID, TextbookID);
+        }
+        else if (student.TextbookSix == -1)
+        {
+            GiveStudentSixthTextbook(StudentID, TextbookID);
+        }
+        else if (student.TextbookSeven == -1)
+        {
+            GiveStudentSeventhTextbook(StudentID, TextbookID);
+        }
+        else if (student.TextbookEight == -1)
+        {
+            GiveStudentEighthTextbook(StudentID, TextbookID);
+        }
+        else if (student.TextbookNine == -1)
+        {
+            GiveStudentNinthTextbook(StudentID, TextbookID);
+        }
+        else
+        {
+            GiveStudentTenthTextbook(StudentID, TextbookID);
         }
     }
     
     // Remove a student's textbook from the specified slot.
     // They won't get any money from the textbook sale.
     @POST
-    @Path("SellStudentTextbook/{StudentID}/{BookSlot}")
+    @Path("SellStudentTextbook/{StudentID}/{TextbookID}")
     @Consumes(MediaType.TEXT_HTML)
     public void SellStudentTextbook(@PathParam("StudentID") int StudentID, 
-            @PathParam("BookSlot") int BookSlot)
+            @PathParam("TextbookID") int TextbookID)
     {
-        switch(BookSlot)
+        Student student = new Student();
+        student = GetSpecificStudent(StudentID);
+        
+        if (student.TextbookOne == TextbookID)
         {
-            case 1:
-                RemoveTextbookOneFromStudent(StudentID);
-                break;
-            case 2:
-                RemoveTextbookTwoFromStudent(StudentID);
-                break;
-            case 3:
-                RemoveTextbookThreeFromStudent(StudentID);
-                break;
-            case 4:
-                RemoveTextbookFourFromStudent(StudentID);
-                break;
-            case 5:
-                RemoveTextbookFiveFromStudent(StudentID);
-                break;
-            case 6:
-                RemoveTextbookSixFromStudent(StudentID);
-                break;
-            case 7:
-                RemoveTextbookSevenFromStudent(StudentID);
-                break;
-            case 8:
-                RemoveTextbookEightFromStudent(StudentID);
-                break;
-            case 9:
-                RemoveTextbookNineFromStudent(StudentID);
-                break;
-            default:
-                RemoveTextbookTenFromStudent(StudentID);
-                break;
+            RemoveTextbookOneFromStudent(StudentID);
+        }
+        else if (student.TextbookTwo == TextbookID)
+        {
+            RemoveTextbookTwoFromStudent(StudentID);
+        }
+        else if (student.TextbookThree == TextbookID)
+        {
+            RemoveTextbookThreeFromStudent(StudentID);
+        }
+        else if (student.TextbookFour == TextbookID)
+        {
+            RemoveTextbookFourFromStudent(StudentID);
+        }
+        else if (student.TextbookFive == TextbookID)
+        {
+            RemoveTextbookFiveFromStudent(StudentID);
+        }
+        else if (student.TextbookSix == TextbookID)
+        {
+            RemoveTextbookSixFromStudent(StudentID);
+        }
+        else if (student.TextbookSeven == TextbookID)
+        {
+            RemoveTextbookSevenFromStudent(StudentID);
+        }
+        else if (student.TextbookEight == TextbookID)
+        {
+            RemoveTextbookEightFromStudent(StudentID);
+        }
+        else if (student.TextbookNine == TextbookID)
+        {
+            RemoveTextbookNineFromStudent(StudentID);
+        }
+        else
+        {
+            RemoveTextbookTenFromStudent(StudentID);
         }
     }
     // </editor-fold>
@@ -578,5 +645,91 @@ public class MyResource {
             // Student is not enrolled in the specified course. Do nothing.
         }
     }
+    // </editor-fold>
+    
+    // <editor-fold desc="Lists returning whether or not a student has the required textbooks.">
+    @GET
+    @Path("DoesStudentHaveRequiredTextbooksForCourse/{StudentID}/{CourseID}")
+    @Consumes(MediaType.TEXT_HTML)
+    @Produces(MediaType.TEXT_PLAIN)
+    public boolean DoesStudentHaveRequiredTextbooksForCourse(@PathParam("StudentID") 
+            int StudentID, @PathParam("CourseID") int CourseID)
+    {
+        Student student = new Student();
+        Course course = new Course();
+        
+        student = GetSpecificStudent(StudentID);
+        course = GetSpecificCourse(CourseID);
+        
+        // Course has two required textbooks.
+        if (course.TextOne != -1 && course.TextTwo != -1)
+        {
+            // check the first required textbook.
+            if ((student.TextbookOne == course.TextOne) || 
+                    (student.TextbookTwo == course.TextOne) ||
+                    (student.TextbookThree == course.TextOne) ||
+                    (student.TextbookFour == course.TextOne) ||
+                    (student.TextbookFive == course.TextOne) ||
+                    (student.TextbookSix == course.TextOne) ||
+                    (student.TextbookSeven == course.TextOne) ||
+                    (student.TextbookEight == course.TextOne) ||
+                    (student.TextbookNine == course.TextOne) ||
+                    (student.TextbookTen == course.TextOne))
+            {
+                // check the second required textbook.
+                if ((student.TextbookOne == course.TextTwo) || 
+                    (student.TextbookTwo == course.TextTwo) ||
+                    (student.TextbookThree == course.TextTwo) ||
+                    (student.TextbookFour == course.TextTwo) ||
+                    (student.TextbookFive == course.TextTwo) ||
+                    (student.TextbookSix == course.TextTwo) ||
+                    (student.TextbookSeven == course.TextTwo) ||
+                    (student.TextbookEight == course.TextTwo) ||
+                    (student.TextbookNine == course.TextTwo) ||
+                    (student.TextbookTen == course.TextTwo))
+                {
+                    return true; // student has the required textbooks.
+                }
+                else
+                {
+                    return false; // student doesn't have the required textbooks.
+                }
+            }
+            
+            else
+            {
+                return false; // student doesn't have the required textbooks.
+            }
+        }
+        
+        // Course has one required textbook.
+        else if (course.TextOne != -1 && course.TextTwo == -1)
+        {
+            if ((student.TextbookOne == course.TextOne) || 
+                    (student.TextbookTwo == course.TextOne) ||
+                    (student.TextbookThree == course.TextOne) ||
+                    (student.TextbookFour == course.TextOne) ||
+                    (student.TextbookFive == course.TextOne) ||
+                    (student.TextbookSix == course.TextOne) ||
+                    (student.TextbookSeven == course.TextOne) ||
+                    (student.TextbookEight == course.TextOne) ||
+                    (student.TextbookNine == course.TextOne) ||
+                    (student.TextbookTen == course.TextOne))
+            {
+                return true; // student has required textbook
+            }
+            
+            else
+            {
+                return false; // student doesn't have required textbook
+            }
+        }
+        
+        else
+        {
+            return true; // no required textbooks
+        }
+    }
+    
     // </editor-fold>
 }
