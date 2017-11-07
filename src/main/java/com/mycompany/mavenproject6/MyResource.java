@@ -46,9 +46,10 @@ public class MyResource {
             @PathParam("Publisher") String Publisher, 
             @PathParam("Edition") int Edition, @PathParam("Date") int Date)
     {
-        if (FindTextbook(Title,Publisher,Edition,Date) == -1)
+        if (FindTextbookByInfo(Title,Publisher,Edition,Date) == 0)
+        {
             AddTextbook(Title,Publisher,Edition,Date);
-            
+        }
     }
     
     // Add a course to the database.
@@ -57,7 +58,7 @@ public class MyResource {
     @Consumes(MediaType.TEXT_HTML)
     public void AddNewCourse(@PathParam("CourseName") String CourseName)
     {
-        if (FindCourseByName(CourseName) == -1)
+        if (FindCourseByName(CourseName) == 0)
             AddCourse(CourseName);
     }
     
@@ -68,7 +69,7 @@ public class MyResource {
     public void AddNewStudent(@PathParam("FirstName") String FirstName,
             @PathParam("LastName") String LastName)
     {
-        if (FindStudentByName(FirstName,LastName) == -1)
+        if (FindStudentByName(FirstName,LastName) == 0)
             AddStudent(FirstName,LastName);
     }
     // </editor-fold>
@@ -83,7 +84,10 @@ public class MyResource {
             @PathParam("Publisher") String Publisher, 
             @PathParam("Edition") int Edition, @PathParam("Date") int Date)
     {
-        UpdateTextbook(TextbookID, Title, Publisher, Edition, Date);
+        if (FindTextbookByInfo(Title,Publisher,Edition,Date) == 0)
+        {
+            UpDateTextbook(TextbookID, Title, Publisher, Edition, Date);
+        }
     }
     
     // UpDate a course.
@@ -93,7 +97,10 @@ public class MyResource {
     public void UpDateSelectedCourse(@PathParam("CourseID") int CourseID, 
             @PathParam("CourseName") String CourseName)
     {
-        UpdateCourse(CourseID, CourseName);
+        if (FindCourseByName(CourseName) == 0)
+        {
+            UpDateCourse(CourseID, CourseName);
+        }
     }
     
     // UpDate a student.
@@ -104,7 +111,10 @@ public class MyResource {
             @PathParam("FirstName") String FirstName, 
             @PathParam("LastName") String LastName)
     {
-        UpdateStudent(StudentID, FirstName, LastName);
+        if (FindStudentByName(FirstName,LastName) == 0)
+        {
+            UpDateStudent(StudentID, FirstName, LastName);
+        }
     }
     // </editor-fold>
     
@@ -255,22 +265,6 @@ public class MyResource {
     // <editor-fold desc="Functions to get everything not associated with an item.">
     // Get all textbooks not owned by the student.
     // This will only be called if the student has room for another textbook.
-//    @GET
-//    @Path("GetTextbooksNotOwnedByStudent/{one}/{two}/{three}/{four}/{five}/{six}/{seven}/{eight}/{nine}")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public List<Textbook> GetTextbooksNotOwnedByStudent(@PathParam("one") int TextbookOne,
-//            @PathParam("two") int TextbookTwo, @PathParam("three") int TextbookThree, 
-//            @PathParam("four") int TextbookFour, @PathParam("five") int TextbookFive, 
-//            @PathParam("six") int TextbookSix, @PathParam("seven") int TextbookSeven, 
-//            @PathParam("eight") int TextbookEight, @PathParam("nine") int TextbookNine)
-//    {
-//        return GetTextbooksCurrentlyNotOwnedByStudent(TextbookOne, TextbookTwo, 
-//                TextbookThree, TextbookFour, TextbookFive, TextbookSix,
-//            TextbookSeven, TextbookEight, TextbookNine);
-//    }
-    
-    // Get all textbooks not owned by the student.
-    // This will only be called if the student has room for another textbook.
     @GET
     @Path("GetTextbooksNotOwnedByStudent/{StudentID}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -297,16 +291,6 @@ public class MyResource {
         return GetAllStudentsNotEnrolledInClass(CourseID);
     }
     
-//    // Get all textbooks not being used by the course.
-//    @GET
-//    @Path("GetTextbooksNotRequiredByCourse/{TextOne}/{TextTwo}")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public List<Textbook> GetTextbooksNotRequiredByCourse(@PathParam("TextOne") 
-//            int TextOne, @PathParam("TextTwo") int TextTwo)
-//    {
-//        return GetTextbooksCurrentlyNotUsedByCourse(TextOne, TextTwo);
-//    }
-    
     // Get all textbooks not being used by the course.
     @GET
     @Path("GetTextbooksNotRequiredByCourse/{CourseID}")
@@ -317,20 +301,6 @@ public class MyResource {
         course = GetSpecificCourse(CourseID);
         return GetTextbooksCurrentlyNotUsedByCourse(course.TextOne, course.TextTwo);
     }
-    
-//    // Get all courses the student is not enrolled in.
-//    // This will only be called if the student has room to add a course.
-//    @GET
-//    @Path("GetCoursesTheStudentCanAdd/{CourseOne}/{CourseTwo}/{CourseThree}/{CourseFour}")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public List<Course> GetCoursesTheStudentCanAdd(@PathParam("CourseOne") 
-//            int CourseOne, @PathParam("CourseTwo") int CourseTwo, 
-//            @PathParam("CourseThree") int CourseThree,
-//            @PathParam("CourseFour") int CourseFour)
-//    {
-//        return GetAllCoursesStudentIsNotEnrolledIn(CourseOne, CourseTwo,
-//                CourseThree, CourseFour);
-//    }
     
     // Get all courses the student is not enrolled in.
     // This will only be called if the student has room to add a course.
@@ -457,21 +427,7 @@ public class MyResource {
     }
     // </editor-fold>
     
-    // <editor-fold desc="Functions to do stuff to a course's textbooks.">
-//    // Add a textbook to the course's required textbooks list.
-//    @POST
-//    @Path("AddRequiredText/{CourseID}/{TextbookID}/{BookSlot}")
-//    @Consumes(MediaType.TEXT_HTML)
-//    public void AddRequiredText(@PathParam("CourseID") int CourseID, 
-//            @PathParam("TextbookID") int TextbookID, 
-//            @PathParam("BookSlot") int BookSlot)
-//    {
-//        if (BookSlot == 1)
-//            AddFirstRequiredTextbook(CourseID, TextbookID);
-//        else
-//            AddSecondRequiredTextbook(CourseID, TextbookID);
-//    }
-    
+    // <editor-fold desc="Functions to do stuff to a course's textbooks.">  
     // Add a textbook to the course's required textbooks list.
     @POST
     @Path("AddRequiredText/{CourseID}/{TextbookID}")
@@ -487,19 +443,6 @@ public class MyResource {
         else
             AddFirstRequiredTextbook(CourseID, TextbookID);
     }
-    
-//    // Remove a textbook from the course's required textbooks list.
-//    @POST
-//    @Path("RemoveRequiredText/{CourseID}/{BookSlot}")
-//    @Consumes(MediaType.TEXT_HTML)
-//    public void RemoveRequiredText(@PathParam("CourseID") int CourseID, 
-//            @PathParam("BookSlot") int BookSlot)
-//    {
-//        if (BookSlot == 1)
-//            RemoveRequiredTextOneFromSpecifiedCourse(CourseID);
-//        else
-//            RemoveRequiredTextTwoFromSpecifiedCourse(CourseID);
-//    }
     
     // Remove a textbook from the course's required textbooks list.
     @POST
@@ -519,61 +462,6 @@ public class MyResource {
     // </editor-fold>
     
     // <editor-fold desc="Functions to do stuff between courses and students.">
-    // Enroll a student in a class.
-    @POST
-    @Path("SignStudentUpForClass/{StudentID}/{CourseID}/{ClassSlot}")
-    @Consumes(MediaType.TEXT_HTML)
-    public void SignStudentUpForClass(@PathParam("StudentID") int StudentID,
-            @PathParam("CourseID") int CourseID, 
-            @PathParam("ClassSlot") int ClassSlot)
-    {
-        switch(ClassSlot)
-        {
-            case 1:
-                EnrollStudentInTheirFirstCourse(StudentID, CourseID);
-                break;
-            case 2:
-                EnrollStudentInTheirSecondCourse(StudentID, CourseID);
-                break;
-            case 3:
-                EnrollStudentInTheirThirdCourse(StudentID, CourseID);
-                break;
-            case 4:
-                EnrollStudentInTheirFourthCourse(StudentID, CourseID);
-                break;
-            default:
-                EnrollStudentInTheirFifthCourse(StudentID, CourseID);
-                break;
-        }
-    }
-    
-    // Specified student drops a class.
-    @POST
-    @Path("StudentDropsClass/{StudentID}/{ClassSlot}")
-    @Consumes(MediaType.TEXT_HTML)
-    public void StudentDropsClass(@PathParam("StudentID") int StudentID, 
-            @PathParam("ClassSlot") int ClassSlot)
-    {
-        switch(ClassSlot)
-        {
-            case 1:
-                StudentDropsCourseOne(StudentID);
-                break;
-            case 2:
-                StudentDropsCourseTwo(StudentID);
-                break;
-            case 3:
-                StudentDropsCourseThree(StudentID);
-                break;
-            case 4:
-                StudentDropsCourseFour(StudentID);
-                break;
-            default:
-                StudentDropsCourseFive(StudentID);
-                break;
-        }
-    }
-    
     // Sign a student up for the specified course, if possible.
     @POST
     @Path("SignStudentUpForClass/{StudentID}/{CourseID}")
@@ -618,36 +506,35 @@ public class MyResource {
             @PathParam("CourseID") int CourseID)
     {
         Student student = new Student();
+        Course course = new Course();
         student = GetSpecificStudent(StudentID);
+        course = GetSpecificCourse(CourseID);
         
-        if (student.CourseOne == CourseID)
+        if (student.CourseOne == course.CourseID)
         {
             StudentDropsCourseOne(StudentID);
         }
-        else if (student.CourseTwo == CourseID)
+        else if (student.CourseTwo == course.CourseID)
         {
             StudentDropsCourseTwo(StudentID);
         }
-        else if (student.CourseThree == CourseID)
+        else if (student.CourseThree == course.CourseID)
         {
             StudentDropsCourseThree(StudentID);
         }    
-        else if (student.CourseFour == CourseID)
+        else if (student.CourseFour == course.CourseID)
         {
             StudentDropsCourseFour(StudentID);
         }    
-        else if (student.CourseFive == CourseID)
-        {
-            StudentDropsCourseFive(StudentID);
-        }    
         else
         {
-            // Student is not enrolled in the specified course. Do nothing.
-        }
+            StudentDropsCourseFive(StudentID);
+        } 
     }
     // </editor-fold>
     
     // <editor-fold desc="Lists returning whether or not a student has the required textbooks.">
+    // Return true if the student has all of their required textbooks for a course.
     @GET
     @Path("DoesStudentHaveRequiredTextbooksForCourse/{StudentID}/{CourseID}")
     @Consumes(MediaType.TEXT_HTML)
@@ -661,8 +548,10 @@ public class MyResource {
         student = GetSpecificStudent(StudentID);
         course = GetSpecificCourse(CourseID);
         
+        
+        
         // Course has two required textbooks.
-        if (course.TextOne != -1 && course.TextTwo != -1)
+        if ((course.TextOne != -1) && (course.TextTwo != -1))
         {
             // check the first required textbook.
             if ((student.TextbookOne == course.TextOne) || 
@@ -677,23 +566,16 @@ public class MyResource {
                     (student.TextbookTen == course.TextOne))
             {
                 // check the second required textbook.
-                if ((student.TextbookOne == course.TextTwo) || 
-                    (student.TextbookTwo == course.TextTwo) ||
-                    (student.TextbookThree == course.TextTwo) ||
-                    (student.TextbookFour == course.TextTwo) ||
-                    (student.TextbookFive == course.TextTwo) ||
-                    (student.TextbookSix == course.TextTwo) ||
-                    (student.TextbookSeven == course.TextTwo) ||
-                    (student.TextbookEight == course.TextTwo) ||
-                    (student.TextbookNine == course.TextTwo) ||
-                    (student.TextbookTen == course.TextTwo))
-                {
-                    return true; // student has the required textbooks.
-                }
-                else
-                {
-                    return false; // student doesn't have the required textbooks.
-                }
+                return (student.TextbookOne == course.TextTwo) || 
+                        (student.TextbookTwo == course.TextTwo) ||
+                        (student.TextbookThree == course.TextTwo) ||
+                        (student.TextbookFour == course.TextTwo) ||
+                        (student.TextbookFive == course.TextTwo) ||
+                        (student.TextbookSix == course.TextTwo) ||
+                        (student.TextbookSeven == course.TextTwo) ||
+                        (student.TextbookEight == course.TextTwo) ||
+                        (student.TextbookNine == course.TextTwo) ||
+                        (student.TextbookTen == course.TextTwo); 
             }
             
             else
@@ -705,7 +587,7 @@ public class MyResource {
         // Course has one required textbook.
         else if (course.TextOne != -1 && course.TextTwo == -1)
         {
-            if ((student.TextbookOne == course.TextOne) || 
+            return (student.TextbookOne == course.TextOne) || 
                     (student.TextbookTwo == course.TextOne) ||
                     (student.TextbookThree == course.TextOne) ||
                     (student.TextbookFour == course.TextOne) ||
@@ -714,15 +596,7 @@ public class MyResource {
                     (student.TextbookSeven == course.TextOne) ||
                     (student.TextbookEight == course.TextOne) ||
                     (student.TextbookNine == course.TextOne) ||
-                    (student.TextbookTen == course.TextOne))
-            {
-                return true; // student has required textbook
-            }
-            
-            else
-            {
-                return false; // student doesn't have required textbook
-            }
+                    (student.TextbookTen == course.TextOne); 
         }
         
         else

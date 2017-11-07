@@ -4,7 +4,12 @@
  * and open the template in the editor.
  */
 package com.mycompany.mavenproject6;
-import java.sql.*;
+//import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +23,7 @@ public class ConnectionToMySQL
     
     // <editor-fold desc="Functions that find items in the database.">
     // Determines if the specified textbook already exists.
-    public static int FindTextbook(String Title, String Publisher,
+    public static int FindTextbookByInfo(String Title, String Publisher,
             int Edition, int Date)
     {
         
@@ -30,9 +35,9 @@ public class ConnectionToMySQL
             Class.forName(JDBC_Driver);
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
-            String query = "SELECT IFNULL((SELECT TextbookID FROM Textbooks ";
-            query = query.concat("WHERE title = ?, publisher = ?, edition = ?");
-            query = query.concat(", date = ?), -1)");
+            String query = "SELECT COUNT(*) FROM Textbooks ";
+            query = query.concat("WHERE Title = ? AND Publisher = ? ");
+            query = query.concat("AND Edition = ? AND Date = ?");
             
             stmt = conn.prepareStatement(query);
             stmt.setString(1, Title);
@@ -68,51 +73,51 @@ public class ConnectionToMySQL
         return TextbookID;
     }
     
-    // Returns true if the textbook id is in the database.
-    public static boolean FindTextbookByID(int id)
-    {
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        int TextbookID = -1;
-        try
-        {
-            Class.forName(JDBC_Driver);
-            conn = DriverManager.getConnection(DB_URL, Username, Password);
-            
-            String query = "SELECT IFNULL((SELECT TextbookID FROM Textbooks ";
-            query = query.concat("WHERE TextbookID = ?), -1)");
-            
-            stmt = conn.prepareStatement(query);
-            stmt.setInt(1, id);
-            
-            ResultSet results = stmt.executeQuery();
-            
-            while(results.next())
-            {
-                // Retrieve by column name.
-                TextbookID = results.getInt(1);
-            }
-            results.close();
-        }
-        catch(SQLException e){}
-        catch(Exception e){}
-        finally
-        {
-            try
-            {
-                if (stmt != null)
-                    stmt.close();
-            }
-            catch (SQLException e){}
-            try
-            {
-                if (conn != null)
-                    conn.close();
-            }
-            catch (SQLException e){}
-        }
-        return TextbookID != -1;
-    }
+//    // Returns true if the textbook id is in the database.
+//    public static boolean FindTextbookByID(int id)
+//    {
+//        Connection conn = null;
+//        PreparedStatement stmt = null;
+//        int TextbookID = -1;
+//        try
+//        {
+//            Class.forName(JDBC_Driver);
+//            conn = DriverManager.getConnection(DB_URL, Username, Password);
+//            
+//            String query = "SELECT IFNULL((SELECT TextbookID FROM Textbooks ";
+//            query = query.concat("WHERE TextbookID = ?), -1)");
+//            
+//            stmt = conn.prepareStatement(query);
+//            stmt.setInt(1, id);
+//            
+//            ResultSet results = stmt.executeQuery();
+//            
+//            while(results.next())
+//            {
+//                // Retrieve by column name.
+//                TextbookID = results.getInt(1);
+//            }
+//            results.close();
+//        }
+//        catch(SQLException e){}
+//        catch(Exception e){}
+//        finally
+//        {
+//            try
+//            {
+//                if (stmt != null)
+//                    stmt.close();
+//            }
+//            catch (SQLException e){}
+//            try
+//            {
+//                if (conn != null)
+//                    conn.close();
+//            }
+//            catch (SQLException e){}
+//        }
+//        return TextbookID != -1;
+//    }
     
     // Determines if the specified course already exists.
     public static int FindCourseByName(String courseName)
@@ -125,8 +130,8 @@ public class ConnectionToMySQL
             Class.forName(JDBC_Driver);
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
-            String query = "SELECT IFNULL((SELECT CourseID FROM Courses WHERE";
-            query = query.concat(" CourseName = ?), -1)");
+            String query = "SELECT COUNT(*) FROM Courses WHERE";
+            query = query.concat(" CourseName = ?");
             
             stmt = conn.prepareStatement(query);
             stmt.setString(1, courseName);
@@ -160,65 +165,65 @@ public class ConnectionToMySQL
         return CourseID;
     }
     
-    // Returns true if the course id is in the database.
-    public static boolean FindCourseByID(int id)
-    {
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        int CourseID = -1;
-        try
-        {
-            Class.forName(JDBC_Driver);
-            conn = DriverManager.getConnection(DB_URL, Username, Password);
-            
-            String query = "SELECT IFNULL((SELECT CourseID FROM Courses WHERE";
-            query = query.concat(" CourseID = ?), -1)");
-            
-            stmt = conn.prepareStatement(query);
-            stmt.setInt(1, id);
-            
-            ResultSet results = stmt.executeQuery();
-            
-            while(results.next())
-            {
-                // Retrieve by column name.
-                CourseID = results.getInt(1);
-            }
-            results.close();
-        }
-        catch(SQLException e){}
-        catch(Exception e){}
-        finally
-        {
-            try
-            {
-                if (stmt != null)
-                    stmt.close();
-            }
-            catch (SQLException e){}
-            try
-            {
-                if (conn != null)
-                    conn.close();
-            }
-            catch (SQLException e){}
-        }
-        return CourseID != -1;
-    }
+//    // Returns true if the course id is in the database.
+//    public static boolean FindCourseByID(int id)
+//    {
+//        Connection conn = null;
+//        PreparedStatement stmt = null;
+//        int CourseID = -1;
+//        try
+//        {
+//            Class.forName(JDBC_Driver);
+//            conn = DriverManager.getConnection(DB_URL, Username, Password);
+//            
+//            String query = "SELECT IFNULL((SELECT CourseID FROM Courses WHERE";
+//            query = query.concat(" CourseID = ?), -1)");
+//            
+//            stmt = conn.prepareStatement(query);
+//            stmt.setInt(1, id);
+//            
+//            ResultSet results = stmt.executeQuery();
+//            
+//            while(results.next())
+//            {
+//                // Retrieve by column name.
+//                CourseID = results.getInt(1);
+//            }
+//            results.close();
+//        }
+//        catch(SQLException e){}
+//        catch(Exception e){}
+//        finally
+//        {
+//            try
+//            {
+//                if (stmt != null)
+//                    stmt.close();
+//            }
+//            catch (SQLException e){}
+//            try
+//            {
+//                if (conn != null)
+//                    conn.close();
+//            }
+//            catch (SQLException e){}
+//        }
+//        return CourseID != -1;
+//    }
     
     // Determines if the specified student already exists.
     public static int FindStudentByName(String FirstName, String LastName)
     {
         Connection conn = null;
         PreparedStatement stmt = null;
-        int StudentID = -1;
+        int StudentID = 0;
         try
         {
             Class.forName(JDBC_Driver);
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
-            String query = "SELECT IFNULL((SELECT StudentID FROM Students ";
-            query = query.concat("WHERE FirstName = ?, LastName = ?), -1)");
+            String query = "SELECT COUNT(*) FROM Students ";
+            query = query.concat("WHERE FirstName = ? AND LastName = ?");
             
             stmt = conn.prepareStatement(query);
             stmt.setString(1, FirstName);
@@ -253,51 +258,51 @@ public class ConnectionToMySQL
         return StudentID;
     }
     
-    // Returns true if the student id is in the database.
-    public static boolean FindStudentByID(int id)
-    {
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        int StudentID = -1;
-        try
-        {
-            Class.forName(JDBC_Driver);
-            conn = DriverManager.getConnection(DB_URL, Username, Password);
-            
-            String query = "SELECT IFNULL((SELECT StudentID FROM Students ";
-            query = query.concat("WHERE StudentID = ?), -1)");
-            
-            stmt = conn.prepareStatement(query);
-            stmt.setInt(1, id);
-            
-            ResultSet results = stmt.executeQuery();
-            
-            while(results.next())
-            {
-                // Retrieve by column name.
-                StudentID = results.getInt(1);
-            }
-            results.close();
-        }
-        catch(SQLException e){}
-        catch(Exception e){}
-        finally
-        {
-            try
-            {
-                if (stmt != null)
-                    stmt.close();
-            }
-            catch (SQLException e){}
-            try
-            {
-                if (conn != null)
-                    conn.close();
-            }
-            catch (SQLException e){}
-        }
-        return StudentID != -1;
-    }
+//    // Returns true if the student id is in the database.
+//    public static boolean FindStudentByID(int id)
+//    {
+//        Connection conn = null;
+//        PreparedStatement stmt = null;
+//        int StudentID = -1;
+//        try
+//        {
+//            Class.forName(JDBC_Driver);
+//            conn = DriverManager.getConnection(DB_URL, Username, Password);
+//            
+//            String query = "SELECT IFNULL((SELECT StudentID FROM Students ";
+//            query = query.concat("WHERE StudentID = ?), -1)");
+//            
+//            stmt = conn.prepareStatement(query);
+//            stmt.setInt(1, id);
+//            
+//            ResultSet results = stmt.executeQuery();
+//            
+//            while(results.next())
+//            {
+//                // Retrieve by column name.
+//                StudentID = results.getInt(1);
+//            }
+//            results.close();
+//        }
+//        catch(SQLException e){}
+//        catch(Exception e){}
+//        finally
+//        {
+//            try
+//            {
+//                if (stmt != null)
+//                    stmt.close();
+//            }
+//            catch (SQLException e){}
+//            try
+//            {
+//                if (conn != null)
+//                    conn.close();
+//            }
+//            catch (SQLException e){}
+//        }
+//        return StudentID != -1;
+//    }
     
     // </editor-fold>
 
@@ -314,8 +319,8 @@ public class ConnectionToMySQL
             Class.forName(JDBC_Driver);
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
-            String query = "INSERT INTO Textbooks (title, publisher, edition,";
-            query = query.concat(" date) VALUES (?, ?, ?, ?)");
+            String query = "INSERT INTO Textbooks (Title, Publisher, Edition,";
+            query = query.concat(" Date) VALUES (?, ?, ?, ?)");
             
             stmt = conn.prepareStatement(query);
             stmt.setString(1, Title);
@@ -430,10 +435,10 @@ public class ConnectionToMySQL
     }
     // </editor-fold>
     
-    // <editor-fold desc="Functions to update items in the database.">
-    // <editor-fold desc="Functions that update names and textbooks.">
-    // Update a textbook
-    public static void UpdateTextbook(int TextbookID, String Title,
+    // <editor-fold desc="Functions to upDate items in the database.">
+    // <editor-fold desc="Functions that upDate names and textbooks.">
+    // UpDate a textbook
+    public static void UpDateTextbook(int TextbookID, String Title,
             String Publisher, int Edition, int Date)
     {
         Connection conn = null;
@@ -444,8 +449,8 @@ public class ConnectionToMySQL
             Class.forName(JDBC_Driver);
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
-            String query = "UPDATE Textbooks SET title = ?, publisher = ?, ";
-            query = query.concat("edition = ?, date = ? WHERE TextbookID = ?");
+            String query = "UPDATE Textbooks SET Title = ?, Publisher = ?, ";
+            query = query.concat("Edition = ?, Date = ? WHERE TextbookID = ?");
             
             stmt = conn.prepareStatement(query);
             stmt.setString(1, Title);
@@ -475,8 +480,8 @@ public class ConnectionToMySQL
         }
     }
     
-    // Update a course name.
-    public static void UpdateCourse(int CourseID, String courseName)
+    // UpDate a course name.
+    public static void UpDateCourse(int CourseID, String courseName)
     {
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -513,8 +518,8 @@ public class ConnectionToMySQL
         }
     }
     
-    // Update a student name.
-    public static void UpdateStudent(int StudentID, String FirstName, String LastName)
+    // UpDate a student name.
+    public static void UpDateStudent(int StudentID, String FirstName, String LastName)
     {
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -1377,7 +1382,7 @@ public class ConnectionToMySQL
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
             String query = "UPDATE Students SET ";
-            query = query.concat("TextbookOne = TextbookTwo");
+            query = query.concat("TextbookOne = TextbookTwo, ");
             query = query.concat("TextbookTwo = TextbookThree, ");
             query = query.concat("TextbookThree = TextbookFour, ");
             query = query.concat("TextbookFour = TextbookFive, ");
@@ -1814,7 +1819,7 @@ public class ConnectionToMySQL
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
             String query = "UPDATE Students SET ";
-            query = query.concat("TextbookOne = TextbookTwo");
+            query = query.concat("TextbookOne = TextbookTwo, ");
             query = query.concat("TextbookTwo = TextbookThree, ");
             query = query.concat("TextbookThree = TextbookFour, ");
             query = query.concat("TextbookFour = TextbookFive, ");
@@ -2251,7 +2256,7 @@ public class ConnectionToMySQL
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
             String query = "UPDATE Students SET ";
-            query = query.concat("CourseOne = CourseTwo");
+            query = query.concat("CourseOne = CourseTwo, ");
             query = query.concat("CourseTwo = CourseThree, ");
             query = query.concat("CourseThree = CourseFour, ");
             query = query.concat("CourseFour = CourseFive, ");
@@ -2458,7 +2463,7 @@ public class ConnectionToMySQL
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
             String query = "UPDATE Students SET ";
-            query = query.concat("CourseOne = CourseTwo");
+            query = query.concat("CourseOne = CourseTwo, ");
             query = query.concat("CourseTwo = CourseThree, ");
             query = query.concat("CourseThree = CourseFour, ");
             query = query.concat("CourseFour = CourseFive, ");
@@ -2665,7 +2670,8 @@ public class ConnectionToMySQL
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
             String query = "UPDATE Courses SET ";
-            query = query.concat("TextOne = -1");
+            query = query.concat("TextOne = TextTwo, ");
+            query = query.concat("TextTwo = -1");
             query = query.concat(" WHERE CourseID = ?");
             
             stmt = conn.prepareStatement(query);
@@ -2746,7 +2752,7 @@ public class ConnectionToMySQL
             conn = DriverManager.getConnection(DB_URL, Username, Password);
             
             String query = "UPDATE Courses SET ";
-            query = query.concat("TextOne = TextTwo");
+            query = query.concat("TextOne = TextTwo, ");
             query = query.concat("TextTwo = -1");
             query = query.concat(" WHERE TextOne = ?");
             

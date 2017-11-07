@@ -368,7 +368,7 @@ function SetupHelperTableToAddCourseToStudent()
 }
 
 </script>
-//--------------------Student View Functions--------------------//
+
 <script type="text/javascript">
 //Gets List of All Courses and input into Selected options
 function StudentList(){
@@ -471,6 +471,8 @@ function UpdateStudentInDatabase()
     {
         if(UpdateStudentToStudentListxhttp.status === 204 && UpdateStudentToStudentListxhttp.readyState === 4)
         {
+            HideButton("Update Button in Students View");
+            HideButton("Delete Button for Student List in Students View");
             StudentList();
         }
     };
@@ -481,6 +483,8 @@ function DeleteStudentInDatabase()
 {
     var temp = document.getElementById("Student List");
     var id = temp.options[temp.selectedIndex].value;
+    
+    HideButton("Delete Button for Student List in Students View");
     
     var RemoveStudentFromDatabasexhttp = new XMLHttpRequest();
     RemoveStudentFromDatabasexhttp.open("DELETE", url+"/DeleteSelectedStudent/"+id);
@@ -541,17 +545,12 @@ function PopulateStudentEnrolledCoursesInStudentView(StudentID)
                 {
                     HideButton("Student Add Class");
                 }
-                // Color the students here based on if they have the appropriate textbooks.
-                var answer = DoesStudentHaveRequiredTextbooksForClass(StudentID, Courses[i].CourseID);
-                if (answer === true)
-                {
-                    InsertCourseIntoTableForViewing("Enrolled Courses", Courses[i], "green");
-                }
                 else
                 {
-                    InsertCourseIntoTableForViewing("Enrolled Courses", Courses[i], "red");
+                    ShowButton("Student Add Class");
                 }
-                
+                // Color the courses here based on if the student has the required textbooks.
+                DoesStudentHaveRequiredTextbooksForClass(StudentID, Courses[i]);
             }
         }
     };
@@ -719,7 +718,7 @@ function DropStudentFromCourseInStudentView()
 {
     var currentStudent = document.getElementById("Student List");
     var studentIdentifier = currentStudent.options[currentStudent.selectedIndex].value;
-    var currentCourse = document.getElementById("Course List Enrolled Students");
+    var currentCourse = document.getElementById("Enrolled Courses");
     var currentCourseIdentifier = currentCourse.options[currentCourse.selectedIndex].value;
     
     var RemoveRequiredTextbookFromCoursexhttp = new XMLHttpRequest();
@@ -738,7 +737,7 @@ function DropStudentFromCourseInStudentView()
 }
 
 </script>
-//--------------------Course View Functions--------------------//
+
 <script type="text/javascript">
 //Gets List of All Courses and input into Selected options
 function CourseList(){
@@ -854,7 +853,7 @@ function DeleteCourseInDatabase()
         {
             HideButton("Delete Button for Course List in Courses View");
             HideButton("Update Button in Courses View");
-            CourseList();
+            onLoad();
 	}
     };
 }
@@ -862,6 +861,8 @@ function DeleteCourseInDatabase()
 // Populate the required textbooks list in the Courses View.
 function PopulateTheRequiredTextbooksListInCourseView(CourseID)
 {
+    HideButton("Delete Button for Required Textbooks List in Courses View");
+    
     var GetCourseListRequiredTextbooksxhttp = new XMLHttpRequest();
     GetCourseListRequiredTextbooksxhttp.open("GET", url+"/GetRequiredTextbooks/"+CourseID);
     GetCourseListRequiredTextbooksxhttp.setRequestHeader("Content-type", "application/json");
@@ -890,6 +891,8 @@ function PopulateTheRequiredTextbooksListInCourseView(CourseID)
 // Populate the enrolled students list in the Courses View.
 function PopulateTheEnrolledStudentsListInCourseView(CourseID)
 {
+    HideButton("Delete Button for Enrolled Student List in Courses View");
+    
     var GetCourseEnrolledStudentsxhttp = new XMLHttpRequest();
     GetCourseEnrolledStudentsxhttp.open("GET", url+"/GetCourseRoster/"+CourseID);
     GetCourseEnrolledStudentsxhttp.setRequestHeader("Content-type", "application/json");
@@ -901,16 +904,9 @@ function PopulateTheEnrolledStudentsListInCourseView(CourseID)
             var Students = JSON.parse(GetCourseEnrolledStudentsxhttp.responseText);
             for(var i in Students)
             {
-                // Color the students here based on if they have the appropriate textbooks.
-                var answer = DoesStudentHaveRequiredTextbooksForClass(Students[i].StudentID, CourseID);
-                if (answer === true)
-                {
-                    InsertStudentIntoTableForViewing("Course List Enrolled Students", Students[i]);
-                }
-                else
-                {
-                    InsertStudentIntoTableForViewing("Course List Enrolled Students", Students[i]);
-                }
+                // This function will color the students appropriately based on if they
+                // have the required textbooks.
+                DoAllStudentsHaveRequiredTextbooksForClass(Students[i], CourseID);
             }
         }
     };
@@ -986,9 +982,11 @@ function RemoveRequiredTextbookFromCourse()
     	if(RemoveRequiredTextbookFromCoursexhttp.status === 204 && RemoveRequiredTextbookFromCoursexhttp.readyState === 4)
         {
             ClearTable("Course List Required Textbooks");
+            ClearTable("Course List Enrolled Students");
             ShowButton("Add Button for Required Textbooks List in Courses View");
-            HideButton("Delete Button for Required Textbooks List in Courses View");
+            
             PopulateTheRequiredTextbooksListInCourseView(courseIdentifier);
+            PopulateTheEnrolledStudentsListInCourseView(courseIdentifier);
 	}
     };
 }
@@ -1090,6 +1088,7 @@ function DropStudentFromCourseInCourseView()
     	if(RemoveRequiredTextbookFromCoursexhttp.status === 204 && RemoveRequiredTextbookFromCoursexhttp.readyState === 4)
         {
             ClearTable("Course List Enrolled Students");
+            ClearTable("Course List Students Textbooks");
             HideButton("Delete Button for Enrolled Student List in Courses View");
             PopulateTheEnrolledStudentsListInCourseView(courseIdentifier);
 	}
@@ -1098,12 +1097,14 @@ function DropStudentFromCourseInCourseView()
 
 
 </script>
-//--------------------Textbook View Functions--------------------//
+
 <script type="text/javascript">
 
 //Gets List of All Textbooks and input into Selected options
 function TextbookList()
 {
+    ClearTable("Textbook List");
+    
     var TextbookListxhttp = new XMLHttpRequest();
     TextbookListxhttp.open("GET", url+"/GetAllTextbooks");
     TextbookListxhttp.setRequestHeader("Content-type", "application/json");
@@ -1224,16 +1225,17 @@ function DeleteTextbookInDatabase()
     	if(RemoveTextbookFromDatabasexhttp.status === 204 && RemoveTextbookFromDatabasexhttp.readyState === 4)
         {
             ClearTable("Textbook List");
+            onLoad();
             HideButton("Delete Button in Textbooks View");
             HideButton("Update Button in Textbooks View");
-            TextbookList();
+            //TextbookList();
 	}
     };
 }
 </script>
 
 <script type="text/javascript">
-//--------------------Button Functions--------------------//
+
 
 // This function is called when the add button on the helper table is clicked.
 function AddAnElementToList()
@@ -1269,27 +1271,27 @@ function AddAnElementToList()
     // Student is buying a textbook.
     else if (document.getElementById("AddTitle").text === "Available Textbooks to Buy")
     {
-        var temp = document.getElementById("");
+        var temp = document.getElementById("Student List");
         var itemAddingTo = temp.options[temp.selectedIndex].value;
         
         var otherTemp = document.getElementById("HelperTable");
         var itemBeingAdded = otherTemp.options[otherTemp.selectedIndex].value;
         
         document.getElementById("AddTable").style.display = "none";
-        
+        StudentBuysTextbook(itemAddingTo, itemBeingAdded);
         
     }
     // Student is signing up for a course.
     else
     {
-        var temp = document.getElementById("");
+        var temp = document.getElementById("Student List");
         var itemAddingTo = temp.options[temp.selectedIndex].value;
         
         var otherTemp = document.getElementById("HelperTable");
         var itemBeingAdded = otherTemp.options[otherTemp.selectedIndex].value;
         
         document.getElementById("AddTable").style.display = "none";
-        
+        EnrollStudentInCourseInStudentView(itemAddingTo, itemBeingAdded);
     }
     
 }
@@ -1305,10 +1307,10 @@ function HelperTableNoLongerTheFocus()
     document.getElementById("AddTable").style.display = "none";
 }
 
-function DoesStudentHaveRequiredTextbooksForClass(StudentID, CourseID)
+function DoesStudentHaveRequiredTextbooksForClass(StudentID, Course)
 {
     var StudentHasRequiredTextbooksxhttp = new XMLHttpRequest();
-    StudentHasRequiredTextbooksxhttp.open("GET", url+"/DoesStudentHaveRequiredTextbooksForCourse/"+StudentID+"/"+CourseID);
+    StudentHasRequiredTextbooksxhttp.open("GET", url+"/DoesStudentHaveRequiredTextbooksForCourse/"+StudentID+"/"+Course.CourseID);
     StudentHasRequiredTextbooksxhttp.setRequestHeader("Content-type", "text/html");
     StudentHasRequiredTextbooksxhttp.send();
     StudentHasRequiredTextbooksxhttp.onreadystatechange=function()
@@ -1317,17 +1319,37 @@ function DoesStudentHaveRequiredTextbooksForClass(StudentID, CourseID)
         {
             if (StudentHasRequiredTextbooksxhttp.responseText === "true")
             {
-                return true;
+                InsertCourseIntoTableForViewing("Enrolled Courses", Course, "green");
             }
             else
             {
-                return false;
+                InsertCourseIntoTableForViewing("Enrolled Courses", Course, "red");
             }
         }
     };
 }
 
-
+function DoAllStudentsHaveRequiredTextbooksForClass(Student, CourseID)
+{
+    var StudentHasRequiredTextbooksxhttp = new XMLHttpRequest();
+    StudentHasRequiredTextbooksxhttp.open("GET", url+"/DoesStudentHaveRequiredTextbooksForCourse/"+Student.StudentID+"/"+CourseID);
+    StudentHasRequiredTextbooksxhttp.setRequestHeader("Content-type", "text/html");
+    StudentHasRequiredTextbooksxhttp.send();
+    StudentHasRequiredTextbooksxhttp.onreadystatechange=function()
+    {
+        if(StudentHasRequiredTextbooksxhttp.status === 200 && StudentHasRequiredTextbooksxhttp.readyState === 4)
+        {
+            if (StudentHasRequiredTextbooksxhttp.responseText === "true")
+            {
+                InsertStudentIntoTableForViewing("Course List Enrolled Students", Student, "green");
+            }
+            else
+            {
+                InsertStudentIntoTableForViewing("Course List Enrolled Students", Student, "red");
+            }
+        }
+    };
+}
 
 
 </script>
