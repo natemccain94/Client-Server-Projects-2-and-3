@@ -195,11 +195,15 @@
 
 <script type="text/javascript">
 // Check all open requests ie GET, POST, DELETE and check header types
-var url = "http://localhost:8080/mavenproject6/webapi/myresource";
+//var url = "http://localhost:8080/mavenproject7/webapi/myresource";
+var url = window.location.href.toString() + "webapi/myresource";
 var WhatListToAddTo;
+
+//*************Startup Functions (and others)******************//
 
 function onLoad()
 {
+    
     StudentList();
     CourseList();
     TextbookList();
@@ -367,9 +371,8 @@ function SetupHelperTableToAddCourseToStudent()
     document.getElementById("AddTable").style.display = "block";
 }
 
-</script>
-
-<script type="text/javascript">
+//*************Student Functions******************//
+//
 //Gets List of All Courses and input into Selected options
 function StudentList(){
     ClearTable("Student List");
@@ -736,9 +739,8 @@ function DropStudentFromCourseInStudentView()
     };
 }
 
-</script>
-
-<script type="text/javascript">
+//*************Course Functions******************//
+//
 //Gets List of All Courses and input into Selected options
 function CourseList(){
     ClearTable("Course List");
@@ -1095,10 +1097,7 @@ function DropStudentFromCourseInCourseView()
     };
 }
 
-
-</script>
-
-<script type="text/javascript">
+//*************Textbook Functions******************//
 
 //Gets List of All Textbooks and input into Selected options
 function TextbookList()
@@ -1232,10 +1231,8 @@ function DeleteTextbookInDatabase()
 	}
     };
 }
-</script>
 
-<script type="text/javascript">
-
+//*************HelperTable Functions******************//
 
 // This function is called when the add button on the helper table is clicked.
 function AddAnElementToList()

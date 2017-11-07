@@ -73,52 +73,6 @@ public class ConnectionToMySQL
         return TextbookID;
     }
     
-//    // Returns true if the textbook id is in the database.
-//    public static boolean FindTextbookByID(int id)
-//    {
-//        Connection conn = null;
-//        PreparedStatement stmt = null;
-//        int TextbookID = -1;
-//        try
-//        {
-//            Class.forName(JDBC_Driver);
-//            conn = DriverManager.getConnection(DB_URL, Username, Password);
-//            
-//            String query = "SELECT IFNULL((SELECT TextbookID FROM Textbooks ";
-//            query = query.concat("WHERE TextbookID = ?), -1)");
-//            
-//            stmt = conn.prepareStatement(query);
-//            stmt.setInt(1, id);
-//            
-//            ResultSet results = stmt.executeQuery();
-//            
-//            while(results.next())
-//            {
-//                // Retrieve by column name.
-//                TextbookID = results.getInt(1);
-//            }
-//            results.close();
-//        }
-//        catch(SQLException e){}
-//        catch(Exception e){}
-//        finally
-//        {
-//            try
-//            {
-//                if (stmt != null)
-//                    stmt.close();
-//            }
-//            catch (SQLException e){}
-//            try
-//            {
-//                if (conn != null)
-//                    conn.close();
-//            }
-//            catch (SQLException e){}
-//        }
-//        return TextbookID != -1;
-//    }
-    
     // Determines if the specified course already exists.
     public static int FindCourseByName(String courseName)
     {
@@ -164,52 +118,6 @@ public class ConnectionToMySQL
         }
         return CourseID;
     }
-    
-//    // Returns true if the course id is in the database.
-//    public static boolean FindCourseByID(int id)
-//    {
-//        Connection conn = null;
-//        PreparedStatement stmt = null;
-//        int CourseID = -1;
-//        try
-//        {
-//            Class.forName(JDBC_Driver);
-//            conn = DriverManager.getConnection(DB_URL, Username, Password);
-//            
-//            String query = "SELECT IFNULL((SELECT CourseID FROM Courses WHERE";
-//            query = query.concat(" CourseID = ?), -1)");
-//            
-//            stmt = conn.prepareStatement(query);
-//            stmt.setInt(1, id);
-//            
-//            ResultSet results = stmt.executeQuery();
-//            
-//            while(results.next())
-//            {
-//                // Retrieve by column name.
-//                CourseID = results.getInt(1);
-//            }
-//            results.close();
-//        }
-//        catch(SQLException e){}
-//        catch(Exception e){}
-//        finally
-//        {
-//            try
-//            {
-//                if (stmt != null)
-//                    stmt.close();
-//            }
-//            catch (SQLException e){}
-//            try
-//            {
-//                if (conn != null)
-//                    conn.close();
-//            }
-//            catch (SQLException e){}
-//        }
-//        return CourseID != -1;
-//    }
     
     // Determines if the specified student already exists.
     public static int FindStudentByName(String FirstName, String LastName)
@@ -257,52 +165,6 @@ public class ConnectionToMySQL
         }
         return StudentID;
     }
-    
-//    // Returns true if the student id is in the database.
-//    public static boolean FindStudentByID(int id)
-//    {
-//        Connection conn = null;
-//        PreparedStatement stmt = null;
-//        int StudentID = -1;
-//        try
-//        {
-//            Class.forName(JDBC_Driver);
-//            conn = DriverManager.getConnection(DB_URL, Username, Password);
-//            
-//            String query = "SELECT IFNULL((SELECT StudentID FROM Students ";
-//            query = query.concat("WHERE StudentID = ?), -1)");
-//            
-//            stmt = conn.prepareStatement(query);
-//            stmt.setInt(1, id);
-//            
-//            ResultSet results = stmt.executeQuery();
-//            
-//            while(results.next())
-//            {
-//                // Retrieve by column name.
-//                StudentID = results.getInt(1);
-//            }
-//            results.close();
-//        }
-//        catch(SQLException e){}
-//        catch(Exception e){}
-//        finally
-//        {
-//            try
-//            {
-//                if (stmt != null)
-//                    stmt.close();
-//            }
-//            catch (SQLException e){}
-//            try
-//            {
-//                if (conn != null)
-//                    conn.close();
-//            }
-//            catch (SQLException e){}
-//        }
-//        return StudentID != -1;
-//    }
     
     // </editor-fold>
 
